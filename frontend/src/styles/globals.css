@@ -1,3 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* This file is intentionally left blank. 
+   The styles are being loaded directly in _document.js via the Tailwind Play CDN. */

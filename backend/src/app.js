@@ -10,13 +10,7 @@ connectDB();
 
 const app = express();
 
-// ** FIX: Public URL CORS Configuration **
-const corsOptions = {
-  origin: 'https://3000-firebase-fra-samanvaya-1758383690579.cluster-cd3bsnf6r5bemwki2bxljme5as.cloudworkstations.dev',
-  optionsSuccessStatus: 200
-};
-app.use(cors(corsOptions));
-
+app.use(cors());
 app.use(express.json());
 
 // Routes
