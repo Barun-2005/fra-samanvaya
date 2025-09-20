@@ -1,15 +1,24 @@
+require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 
-dotenv.config();
-
+// Connect to the database
 connectDB();
 
 const app = express();
 
-app.use(cors());
+// ** FIX: Explicit CORS Configuration **
+// We are telling the backend server to only accept requests
+// from the frontend's development address.
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+app.use(cors(corsOptions));
+
+
 app.use(express.json());
 
 // Routes
