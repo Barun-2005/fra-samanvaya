@@ -3,6 +3,7 @@ dotenv.config({ path: './.env' });
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser'); // Import cookie-parser
 const connectDB = require('./config/db');
 
 // Connect to the database
@@ -10,7 +11,14 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+// --- THIS IS THE FIX ---
+app.use(cookieParser()); // Use cookie-parser middleware
+// --- END OF FIX ---
+
+app.use(cors({
+    origin: 'https://3000-firebase-fra-samanvaya-1758383690579.cluster-cd3bsnf6r5bemwki2bxljme5as.cloudworkstations.dev',
+    credentials: true,
+}));
 app.use(express.json());
 
 // Routes

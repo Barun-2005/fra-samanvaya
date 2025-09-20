@@ -1,2 +1,12 @@
-/* This file is intentionally left blank. 
-   The styles are being loaded directly in _document.js via the Tailwind Play CDN. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.form-input {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.form-input:focus {
+  border-color: #123a97;
+  box-shadow: 0 0 0 3px rgba(18, 58, 151, 0.2);
+  outline: none;
+}

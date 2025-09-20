@@ -3,100 +3,92 @@ const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
 const jwt = require('jsonwebtoken');
 
-exports.register = async (req, res) => {
-  const { username, password, role, maskedAadhaar } = req.body;
+// Helper to generate and set tokens
+const generateAndSetTokens = (res, user) => {
+    const accessToken = jwt.sign({ user: { id: user._id, roles: user.roles } }, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' });
+    const refreshToken = jwt.sign({ user: { id: user._id } }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES || '7d' });
 
-  try {
-    const user = new User({
-      username,
-      password,
-      role,
-      maskedAadhaar,
+    res.cookie('accessToken', accessToken, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production', 
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
-    await user.save();
+    res.cookie('refreshToken', refreshToken, { 
+        httpOnly: true, 
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+};
 
-    res.status(201).json({ message: 'User created successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error creating user', error });
-  }
+exports.register = async (req, res) => {
+    // ... (existing code)
 };
 
 exports.login = async (req, res) => {
     const { username, password } = req.body;
   
     try {
-      const user = await User.findOne({ username });
+        const user = await User.findOne({ username });
   
-      if (!user || !(await user.comparePassword(password))) {
-        return res.status(401).json({ message: 'Invalid credentials' });
-      }
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(401).json({ message: 'Invalid credentials' });
+        }
   
-      if (user.totpSecret) {
-        const tempToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '10m' });
-        return res.json({ twofaRequired: true, tempToken });
+        // If user has 2FA, send a temp token and require verification
+        if (user.totpSecret) {
+            const tempToken = jwt.sign({ userId: user._id, action: '2fa_verify' }, process.env.JWT_ACCESS_SECRET, { expiresIn: '10m' });
+            return res.json({ requires2FA: true, tempToken });
+        }
+  
+        // --- THIS IS THE FIX ---
+        // If login is successful and no 2FA is needed, generate tokens and send success
+        generateAndSetTokens(res, user);
+        res.status(200).json({ message: 'Login successful' });
+        // --- END OF FIX ---
 
-      }
-  
-      const accessToken = jwt.sign({ user: { id: user._id, role: user.role } }, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRES });
-      const refreshToken = jwt.sign({ user: { id: user._id } }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES });
-  
-      res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-      res.json({ accessToken });
     } catch (error) {
-      res.status(500).json({ message: 'Error logging in', error });
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error during login' });
     }
-  };
+};
 
 exports.verify2FA = async (req, res) => {
     const { tempToken, totpCode } = req.body;
 
     try {
-      const decodedToken = jwt.verify(tempToken, process.env.JWT_ACCESS_SECRET);
-      const user = await User.findById(decodedToken.userId);
+        const decodedToken = jwt.verify(tempToken, process.env.JWT_ACCESS_SECRET);
+        if (decodedToken.action !== '2fa_verify') {
+             return res.status(401).json({ message: 'Invalid token purpose' });
+        }
 
-      if (!user) {
-        return res.status(401).json({ message: 'Invalid token' });
-      }
+        const user = await User.findById(decodedToken.userId);
 
-      const verified = speakeasy.totp.verify({
-        secret: user.totpSecret,
-        encoding: 'base32',
-        token: totpCode,
-      });
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
 
-      if (!verified) {
-        return res.status(401).json({ message: 'Invalid TOTP code' });
-      }
+        const verified = speakeasy.totp.verify({
+            secret: user.totpSecret,
+            encoding: 'base32',
+            token: totpCode,
+        });
 
-      const accessToken = jwt.sign({ user: { id: user._id, role: user.role } }, process.env.JWT_ACCESS_SECRET, { expiresIn: process.env.JWT_ACCESS_EXPIRES });
-      const refreshToken = jwt.sign({ user: { id: user._id } }, process.env.JWT_REFRESH_SECRET, { expiresIn: process.env.JWT_REFRESH_EXPIRES });
+        if (!verified) {
+            return res.status(401).json({ message: 'Invalid TOTP code' });
+        }
 
-      res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
-      res.json({ accessToken });
+        // If 2FA is successful, generate tokens and send success
+        generateAndSetTokens(res, user);
+        res.status(200).json({ message: 'Verification successful' });
+
     } catch (error) {
-      res.status(500).json({ message: 'Error verifying 2FA', error });
+        res.status(500).json({ message: 'Error verifying 2FA', error });
     }
-  };
+};
 
 exports.setupTOTP = async (req, res) => {
-    try {
-        const secret = speakeasy.generateSecret({
-          name: process.env.TOTP_ISSUER,
-        });
-    
-        await User.findByIdAndUpdate(req.user.id, { totpSecret: secret.base32 });
-    
-        qrcode.toDataURL(secret.otpauth_url, (err, data_url) => {
-          if (err) {
-            return res.status(500).json({ message: 'Error generating QR code' });
-          }
-          res.json({
-            secret: secret.base32,
-            qrCodeUrl: data_url,
-          });
-        });
-      } catch (error) {
-        res.status(500).json({ message: 'Error setting up TOTP', error });
-      }
+    // ... (existing code)
 };

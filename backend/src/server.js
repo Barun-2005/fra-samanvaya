@@ -3,7 +3,9 @@ dotenv.config({ path: './.env' });
 
 const app = require('./app');
 
-const PORT = process.env.PORT || 8080;
+// --- THIS IS THE FIX ---
+const PORT = process.env.PORT || 4000;
+// --- END OF FIX ---
 const HOST = '0.0.0.0';
 
 app.listen(PORT, HOST, () => {

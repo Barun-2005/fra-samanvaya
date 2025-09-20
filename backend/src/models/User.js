@@ -4,7 +4,18 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['SuperAdmin', 'Admin', 'Verifier', 'Claimant'], default: 'Claimant' },
+  displayName: { type: String },
+  // --- THIS IS THE FIX ---
+  roles: { 
+    type: [{ 
+      type: String, 
+      enum: ['SuperAdmin', 'DataEntry', 'Verifier', 'Approver', 'SchemeAdmin', 'NGOViewer'] 
+    }], 
+    default: ['DataEntry'] 
+  },
+  // --- END OF FIX ---
+  state: { type: String },
+  district: { type: String },
   totpSecret: { type: String },
   maskedAadhaar: { type: String },
   createdAt: { type: Date, default: Date.now },
