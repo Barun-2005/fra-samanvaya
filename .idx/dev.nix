@@ -31,7 +31,7 @@
       previews = {
         # The Frontend Web Preview
         web = {
-          command = ["npm" "run" "dev"];
+          command = ["npm", "run", "dev"];
           manager = "web";
           env = {
             # This is a special variable from the IDE. It will contain the
@@ -41,11 +41,9 @@
         };
         # The Backend API Preview
         backend = {
-          command = ["npm" "run" "dev"];
+          command = ["npm", "run", "dev"];
           # The working directory for this command
           cwd = "backend";
-          # The port the backend server will run on
-          port = 4000;
         };
       };
     };
