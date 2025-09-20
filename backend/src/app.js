@@ -1,4 +1,5 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
+const dotenv = require('dotenv');
+dotenv.config({ path: './.env' });
 
 const express = require('express');
 const cors = require('cors');
@@ -9,15 +10,12 @@ connectDB();
 
 const app = express();
 
-// ** FIX: Explicit CORS Configuration **
-// We are telling the backend server to only accept requests
-// from the frontend's development address.
+// ** FIX: Public URL CORS Configuration **
 const corsOptions = {
-  origin: 'http://localhost:3000',
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: 'https://3000-firebase-fra-samanvaya-1758383690579.cluster-cd3bsnf6r5bemwki2bxljme5as.cloudworkstations.dev',
+  optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-
 
 app.use(express.json());
 

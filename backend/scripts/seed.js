@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const User = require('../src/models/User');
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: './.env' });
 
 
 const seedDB = async () => {
@@ -10,7 +10,7 @@ const seedDB = async () => {
         useNewUrlParser: true,
         useUnifiedTopology: true,
       });
-    
+
   await User.deleteMany({});
 
   const superAdmin = new User({
