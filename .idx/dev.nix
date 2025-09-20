@@ -9,6 +9,8 @@
     pkgs.yarn
     pkgs.nodePackages.pnpm
     pkgs.bun
+    pkgs.docker
+    pkgs.docker-compose
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -32,6 +34,10 @@
         ];
       };
       # To run something each time the workspace is (re)started, use the `onStart` hook
+       onStart = {
+        # The following command will start the Docker daemon automatically.
+        docker-daemon = "sh -c 'if ! docker info > /dev/null 2>&1; then sudo dockerd > /tmp/dockerd.log 2>&1 & fi' > /dev/null";
+      };
     };
     # Enable previews and customize configuration
     previews = {
@@ -40,6 +46,10 @@
         web = {
           command = ["npm" "run" "dev" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
           manager = "web";
+          env = {
+            # Environment variables to set for the preview server
+            NEXT_PUBLIC_API_BASE = "http://localhost:4000/api";
+          };
         };
       };
     };

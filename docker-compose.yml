@@ -1,0 +1,20 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/usr/src/app
+    # This tells docker-compose to read your .env file
+    # and pass the variables to the backend service.
+    env_file:
+      - .env
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend:/usr/src/app
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://localhost:4000/api

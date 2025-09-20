@@ -148,3 +148,97 @@ The AI's workflow is iterative, transparent, and responsive to user input.
   4. **Compile & Analyze:** AI runs `npm run lint` and monitors the dev server.
   5. **Preview Check:** AI observes the browser preview for visual and runtime errors.
   6. **Remediation/Report:** If errors are found, AI attempts automatic fixes. If unsuccessful, it reports details to the user.
+  # **AI Development Guidelines for FRA Samanvaya (Next.js + Express + Firebase Studio)**
+
+These guidelines define how the AI agent (Gemini) will interact with this project. They combine the default Firebase Studio guidelines with FRA Samanvaya–specific rules for backend, frontend, and microservices.
+
+---
+
+## **Environment & Context Awareness**
+
+- The AI runs inside **Firebase Studio** (Code OSS IDE).
+- The project uses **Next.js (App Router, JavaScript, Tailwind)** in `/frontend` and **Express + Mongoose** in `/backend`.
+- Microservices are deployed externally (Google Cloud Run) and accessed via `.env` URLs. AI must never hardcode credentials.
+- `.env.example` contains placeholders. **User will fill actual values manually.**
+- The AI should read/write to:
+  - `/frontend` → Next.js code.
+  - `/backend` → Node.js/Express code.
+  - `/stitch_html` → UI/UX exports from Stitch.
+  - `/blueprint.md` → running record of features & plan.
+  - `/gemini.md` → these rules.
+
+---
+
+## **Backend Rules (Express + MongoDB Atlas)**
+
+- Database: MongoDB Atlas (URI in `.env`).
+- Models to maintain: `User`, `Claim`, `Document`, `AuditLog`, `Scheme`, `Asset`.
+- Auth: username/password with **JWT + TOTP 2FA**.
+- Middleware:
+  - `requireAuth` for authentication.
+  - `requireRole` for RBAC (Admin, DataEntry, Verifier, Approver, SuperAdmin, NGOViewer).
+- Endpoints (already scaffolded) must be expanded as needed:
+  - `/api/auth` → register, login, refresh token, 2FA setup/verify.
+  - `/api/claims` → CRUD claims, search, advanced filters.
+  - `/api/documents` → upload to OCR service.
+  - `/api/assets` → call Asset Mapper.
+  - `/api/schemes` → CRUD schemes, recommend via Gemini.
+
+---
+
+## **Frontend Rules (Next.js + Tailwind)**
+
+- Routes live in `/frontend/app`.
+- Stitch exports (`stitch_html`) must be converted into Next.js components.
+- Keep layouts modular: `/frontend/components` for shared UI.
+- Authentication flow: `/login`, `/2fa`, `/dashboard`.
+- Pages to implement: **17 pages total** (see blueprint.md).
+- Always wire frontend forms to backend API routes (`NEXT_PUBLIC_API_BASE`).
+
+---
+
+## **Microservice Integration**
+
+- OCR service: `OCR_SERVICE_URL` → POST file/image, receive extracted text.
+- Asset service: `ASSET_SERVICE_URL` → POST map image, receive asset polygons.
+- Gemini API: `GEMINI_API_KEY` → used for:
+  - Auto form-fill from OCR.
+  - DSS recommendations.
+  - Scheme recommendations.
+- If env vars are missing → fall back to mocks when `USE_MOCKS=true`.
+
+---
+
+## **Dev Process**
+
+1. **Always update `/blueprint.md`** before/after changes.
+2. **When adding a page:**  
+   - Convert Stitch export → Tailwind Next.js component.  
+   - Connect to backend routes.  
+   - Update blueprint.
+3. **When updating backend:**  
+   - Modify model/controller/route in `/backend`.  
+   - Test with mock data if env not filled.  
+   - Update blueprint.
+4. **Error handling:**  
+   - Run `npm run lint -- --fix`.  
+   - Monitor Firebase Studio diagnostics.  
+   - Auto-correct when possible.
+
+---
+
+## **Visual Design**
+
+- Use Tailwind + Stitch reference for layout.
+- All pages must be responsive and accessible (A11Y).
+- Use modern cards, typography, shadows, spacing.
+
+---
+
+## **Iteration**
+
+- Always propose a **plan first**, then execute.  
+- Never overwrite `.env` — only `.env.example`.  
+- When unsure about an integration, log it in blueprint.md for manual review.  
+
+---
