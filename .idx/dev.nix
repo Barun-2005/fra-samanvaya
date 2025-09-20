@@ -9,7 +9,7 @@
     pkgs.yarn
     pkgs.nodePackages.pnpm
     pkgs.bun
-    pkgs.psmisc # Provides killall
+    pkgs.psmisc # Provides killall, a tool to stop processes
   ];
   # Sets environment variables in the workspace
   env = {};
@@ -21,7 +21,7 @@
     workspace = {
       # To run something each time the workspace is (re)started, use the `onStart` hook
       onStart = {
-        # Kill any zombie node processes that might be hogging ports
+        # Kill any zombie node processes that might be hogging ports from previous sessions
         kill-zombies = "killall -q -s 9 node || true";
       };
     };
@@ -32,6 +32,8 @@
         # The Frontend Web Preview
         web = {
           command = ["npm", "run", "dev"];
+          # Set the working directory for the command
+          cwd = "frontend";
           manager = "web";
           env = {
             # This is a special variable from the IDE. It will contain the
@@ -44,6 +46,7 @@
           command = ["npm", "run", "dev"];
           # The working directory for this command
           cwd = "backend";
+          # The invalid 'port' attribute has been removed.
         };
       };
     };
