@@ -9,47 +9,43 @@
     pkgs.yarn
     pkgs.nodePackages.pnpm
     pkgs.bun
-    pkgs.docker
-    pkgs.docker-compose
+    pkgs.psmisc # Provides killall
   ];
   # Sets environment variables in the workspace
   env = {};
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
-      # "vscodevim.vim"
       "google.gemini-cli-vscode-ide-companion"
     ];
     workspace = {
-      # Runs when a workspace is first created with this `dev.nix` file
-      onCreate = {
-        npm-install = "npm ci --no-audit --prefer-offline --no-progress --timing";
-        # Open editors for the following files by default, if they exist:
-        default.openFiles = [
-          # Cover all the variations of language, src-dir, router (app/pages)
-          "pages/index.tsx" "pages/index.js"
-          "src/pages/index.tsx" "src/pages/index.js"
-          "app/page.tsx" "app/page.js"
-          "src/app/page.tsx" "src/app/page.js"
-        ];
-      };
       # To run something each time the workspace is (re)started, use the `onStart` hook
-       onStart = {
-        # The following command will start the Docker daemon automatically.
-        docker-daemon = "sh -c 'if ! docker info > /dev/null 2>&1; then sudo dockerd > /tmp/dockerd.log 2>&1 & fi' > /dev/null";
+      onStart = {
+        # Kill any zombie node processes that might be hogging ports
+        kill-zombies = "killall -q -s 9 node || true";
       };
     };
     # Enable previews and customize configuration
     previews = {
       enable = true;
       previews = {
+        # The Frontend Web Preview
         web = {
-          command = ["npm" "run" "dev" "--" "--port" "$PORT" "--hostname" "0.0.0.0"];
+          command = ["npm" "run" "dev"];
           manager = "web";
           env = {
-            # Environment variables to set for the preview server
-            NEXT_PUBLIC_API_BASE = "http://localhost:4000/api";
+            # This is a special variable from the IDE. It will contain the
+            # public URL of our backend preview service.
+            NEXT_PUBLIC_API_BASE = "$IDES_PREVIEW_BACKEND_URL/api";
           };
+        };
+        # The Backend API Preview
+        backend = {
+          command = ["npm" "run" "dev"];
+          # The working directory for this command
+          cwd = "backend";
+          # The port the backend server will run on
+          port = 4000;
         };
       };
     };

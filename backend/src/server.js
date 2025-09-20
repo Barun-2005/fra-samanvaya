@@ -6,7 +6,9 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env'
 const app = require('./app');
 
 const PORT = process.env.PORT || 4000;
+const HOST = '0.0.0.0'; // This is the crucial change
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  // Updated log message for clarity
+  console.log(`✅ Backend server is running and listening at http://${HOST}:${PORT}`);
 });
