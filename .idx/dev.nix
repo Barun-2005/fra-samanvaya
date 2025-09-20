@@ -3,6 +3,7 @@
 {pkgs}: {
   # Which nixpkgs channel to use.
   channel = "stable-24.05"; # or "unstable"
+
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.nodejs_20
@@ -11,13 +12,16 @@
     pkgs.bun
     pkgs.psmisc # Provides killall, a tool to stop processes
   ];
+
   # Sets environment variables in the workspace
   env = {};
+
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       "google.gemini-cli-vscode-ide-companion"
     ];
+
     workspace = {
       # To run something each time the workspace is (re)started, use the `onStart` hook
       onStart = {
@@ -25,14 +29,14 @@
         kill-zombies = "killall -q -s 9 node || true";
       };
     };
+
     # Enable previews and customize configuration
     previews = {
       enable = true;
       previews = {
         # The Frontend Web Preview
         web = {
-          command = ["npm", "run", "dev"];
-          # Set the working directory for the command
+          command = [ "npm" "run" "dev" ];
           cwd = "frontend";
           manager = "web";
           env = {
@@ -43,10 +47,8 @@
         };
         # The Backend API Preview
         backend = {
-          command = ["npm", "run", "dev"];
-          # The working directory for this command
+          command = [ "npm" "run" "dev" ];
           cwd = "backend";
-          # The invalid 'port' attribute has been removed.
         };
       };
     };
