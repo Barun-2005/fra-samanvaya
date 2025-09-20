@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#123a97",
+              "background-light": "#f6f6f8",
+              "background-dark": "#111621",
+            },
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+    </style>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-background-dark/10 px-10 py-3 dark:border-background-light/10">
+<div class="flex items-center gap-4 text-background-dark dark:text-background-light">
+<svg class="size-6 text-primary" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L2 7V17L12 22L22 17V7L12 2ZM4 8.236L12 12.536V20L4 15.7V8.236ZM13 12.536L21 8.236V15.7L13 20V12.536ZM20.465 6L12 10.465L3.535 6L12 3.535L20.465 6Z"></path>
+</svg>
+<h2 class="text-lg font-bold tracking-tight text-background-dark dark:text-background-light">FRA Claims</h2>
+</div>
+<div class="flex flex-1 items-center justify-end gap-6">
+<nav class="flex items-center gap-6">
+<a class="text-sm font-medium text-background-dark/70 transition-colors hover:text-primary dark:text-background-light/70 dark:hover:text-primary" href="#">Dashboard</a>
+<a class="text-sm font-medium text-primary" href="#">Claims</a>
+<a class="text-sm font-medium text-background-dark/70 transition-colors hover:text-primary dark:text-background-light/70 dark:hover:text-primary" href="#">Reports</a>
+<a class="text-sm font-medium text-background-dark/70 transition-colors hover:text-primary dark:text-background-light/70 dark:hover:text-primary" href="#">Admin</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-background-light text-background-dark/60 transition-colors hover:bg-primary/10 hover:text-primary dark:bg-background-dark/50 dark:text-background-light/60 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined"> notifications </span>
+</button>
+<div class="h-10 w-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCQ1tu9JsZ9IRZo9obaBNFOruUAmhBKMHYYsUlg_OtiKXjL5blIaOva26yn3JePmmkPrVc4StYRQwY_P-iZL252rQsWZ1pi5tvm6_F5xlJzV8rA9UTHOtCobtYaJzDdDk2Y-6ylaJ788yzVQ6Te4Ujk8QFINNt32JvzHHv7PEA3cRcAi_Q3g4r0sjSQaQ4k8vtv6t6vVYwKZ5_dJ3QgSqUUP0gNF4k6njBF_MwtZZpHmjRZgbj8I4CFmXQYjVJ4sNdPMGviJEJNJXP");'></div>
+</div>
+</div>
+</header>
+<main class="flex flex-1 justify-center p-4 sm:p-6 lg:p-8">
+<div class="grid w-full max-w-7xl grid-cols-1 gap-6 lg:grid-cols-3">
+<div class="flex flex-col gap-6 lg:col-span-1">
+<h1 class="text-3xl font-bold tracking-tight text-background-dark dark:text-background-light">Claim Management</h1>
+<div class="flex flex-col gap-4 rounded-xl border border-background-dark/10 bg-background-light p-4 shadow-sm dark:border-background-light/10 dark:bg-background-dark">
+<h3 class="font-bold text-background-dark dark:text-background-light">Tools</h3>
+<div class="flex flex-col gap-2">
+<button class="flex items-center gap-3 rounded-lg bg-primary/10 px-4 py-3 text-left text-sm font-medium text-primary dark:bg-primary/20">
+<span class="material-symbols-outlined text-xl"> upload_file </span>
+<span>Upload shapefile</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-background-dark/70 hover:bg-primary/10 hover:text-primary dark:text-background-light/70 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined text-xl"> draw </span>
+<span>Draw polygon</span>
+</button>
+<button class="flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-background-dark/70 hover:bg-primary/10 hover:text-primary dark:text-background-light/70 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined text-xl"> zoom_in_map </span>
+<span>Zoom to claim</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-4 rounded-xl border border-background-dark/10 bg-background-light p-4 shadow-sm dark:border-background-light/10 dark:bg-background-dark">
+<h3 class="font-bold text-background-dark dark:text-background-light">Layers</h3>
+<div class="flex flex-col gap-3">
+<label class="flex items-center justify-between">
+<span class="text-sm font-medium text-background-dark dark:text-background-light">IFR</span>
+<input checked="" class="form-checkbox h-5 w-5 rounded border-background-dark/30 bg-background-light text-primary focus:ring-2 focus:ring-primary/50 focus:ring-offset-background-light dark:border-background-light/30 dark:bg-background-dark dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between">
+<span class="text-sm font-medium text-background-dark dark:text-background-light">CFR</span>
+<input checked="" class="form-checkbox h-5 w-5 rounded border-background-dark/30 bg-background-light text-primary focus:ring-2 focus:ring-primary/50 focus:ring-offset-background-light dark:border-background-light/30 dark:bg-background-dark dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between">
+<span class="text-sm font-medium text-background-dark dark:text-background-light">CR</span>
+<input class="form-checkbox h-5 w-5 rounded border-background-dark/30 bg-background-light text-primary focus:ring-2 focus:ring-primary/50 focus:ring-offset-background-light dark:border-background-light/30 dark:bg-background-dark dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+<label class="flex items-center justify-between">
+<span class="text-sm font-medium text-background-dark dark:text-background-light">Assets</span>
+<input checked="" class="form-checkbox h-5 w-5 rounded border-background-dark/30 bg-background-light text-primary focus:ring-2 focus:ring-primary/50 focus:ring-offset-background-light dark:border-background-light/30 dark:bg-background-dark dark:focus:ring-offset-background-dark" type="checkbox"/>
+</label>
+</div>
+</div>
+<button class="mt-auto flex h-14 w-full items-center justify-center gap-3 rounded-xl bg-primary px-6 text-base font-bold text-white shadow-lg transition-transform hover:scale-[1.02]">
+<span class="material-symbols-outlined text-2xl"> add </span>
+<span>New Claim</span>
+</button>
+</div>
+<div class="relative min-h-[480px] w-full overflow-hidden rounded-xl shadow-lg lg:col-span-2">
+<div class="absolute inset-0 h-full w-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBJ-QfrkR6b37HnvWtvfBiaGbbhp2LFW7EWi0YzqcdKPinRv9cb3iK1xq48EKayex8ugMZaUyPkE4cuKvRl_gPDe_FLzW7k1tk67I9E7GICPJme8DQaCZAvShKM5AELY623FgPu2pUot264nmp5j5Vr-xF4j-V7l1hWFWO52dljw_NwzB9voT_Pu_2eS_PUo0-R-KzQ11MzmCgodF19QXPh8GK7WsRZREhvMIilqPrw14uTta3-4xA5OEXYSe5ylGec0Gnk_YqmbJ88");'></div>
+<div class="absolute inset-0 bg-primary/20 mix-blend-multiply dark:bg-primary/30"></div>
+<div class="relative z-10 flex h-full flex-col justify-between p-4 sm:p-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-background-dark/50 dark:text-background-light/50"> search </span>
+<input class="form-input h-12 w-full max-w-sm rounded-lg border-0 bg-background-light/80 pl-10 text-background-dark placeholder-background-dark/50 shadow-sm backdrop-blur-sm focus:ring-2 focus:ring-primary dark:bg-background-dark/80 dark:text-background-light dark:placeholder-background-light/50" placeholder="Search for a claim"/>
+</div>
+<div class="flex flex-col items-end gap-3">
+<div class="flex flex-col rounded-lg bg-background-light/80 shadow-lg backdrop-blur-sm dark:bg-background-dark/80">
+<button class="flex h-10 w-10 items-center justify-center rounded-t-lg text-background-dark/70 hover:bg-primary/10 hover:text-primary dark:text-background-light/70 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined text-2xl"> add </span>
+</button>
+<div class="h-px w-full bg-background-dark/10 dark:bg-background-light/10"></div>
+<button class="flex h-10 w-10 items-center justify-center rounded-b-lg text-background-dark/70 hover:bg-primary/10 hover:text-primary dark:text-background-light/70 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined text-2xl"> remove </span>
+</button>
+</div>
+<button class="flex h-10 w-10 items-center justify-center rounded-lg bg-background-light/80 text-background-dark/70 shadow-lg backdrop-blur-sm hover:bg-primary/10 hover:text-primary dark:bg-background-dark/80 dark:text-background-light/70 dark:hover:bg-primary/20">
+<span class="material-symbols-outlined text-xl"> near_me </span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>

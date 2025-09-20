@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FRA Claim Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3B82F6",
+                        "primary-foreground": "#FFFFFF",
+                        "secondary": "#93C5FD",
+                        "secondary-foreground": "#111827",
+                        "success": "#10B981",
+                        "success-foreground": "#FFFFFF",
+                        "warning": "#F59E0B",
+                        "warning-foreground": "#FFFFFF",
+                        "danger": "#EF4444",
+                        "danger-foreground": "#FFFFFF",
+                        "background": "#F9FAFB",
+                        "foreground": "#111827",
+                        "muted": "#F3F4F6",
+                        "muted-foreground": "#6B7280",
+                        "card": "#FFFFFF",
+                        "border": "#E5E7EB",
+                        "ring": "#A5B4FC",
+                        dark: {
+                            "primary": "#60A5FA",
+                            "primary-foreground": "#111827",
+                            "secondary": "#374151",
+                            "secondary-foreground": "#F9FAFB",
+                            "success": "#34D399",
+                            "success-foreground": "#111827",
+                            "warning": "#FBBF24",
+                            "warning-foreground": "#111827",
+                            "danger": "#F87171",
+                            "danger-foreground": "#111827",
+                            "background": "#111827",
+                            "foreground": "#F9FAFB",
+                            "muted": "#1F2937",
+                            "muted-foreground": "#9CA3AF",
+                            "card": "#1F2937",
+                            "border": "#374151",
+                            "ring": "#4F46E5",
+                        }
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "sm": "0.25rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+                        'soft-md': '0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background text-foreground dark:bg-dark-background dark:text-dark-foreground">
+<div class="flex min-h-screen flex-col">
+<header class="sticky top-0 z-10 border-b border-border bg-card dark:border-dark-border dark:bg-dark-card">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<div class="flex h-16 items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary dark:text-dark-primary text-3xl">assured_workload</span>
+<h1 class="text-xl font-bold tracking-tight text-foreground dark:text-dark-foreground">FRA Claims</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+<a class="text-muted-foreground hover:text-primary dark:text-dark-muted-foreground dark:hover:text-dark-primary" href="#">Dashboard</a>
+<a class="text-primary font-semibold dark:text-dark-primary" href="#">Claims</a>
+<a class="text-muted-foreground hover:text-primary dark:text-dark-muted-foreground dark:hover:text-dark-primary" href="#">Payments</a>
+<a class="text-muted-foreground hover:text-primary dark:text-dark-muted-foreground dark:hover:text-dark-primary" href="#">Reports</a>
+<a class="text-muted-foreground hover:text-primary dark:text-dark-muted-foreground dark:hover:text-dark-primary" href="#">Settings</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="relative rounded-full p-1 text-muted-foreground hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 dark:text-dark-muted-foreground dark:hover:text-dark-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="User avatar" class="h-9 w-9 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqE2go41O-YsV2TyAHBj8LJ4m8Oo29AN1e7TUJdc8jNe_W0ekSiP5B-DG6Dz91py8DcIWCW0gurQivAuelbDwgUT1fb9opbvQbY-YH1LsFUn6BnIoLxLBWBiffkXFtAfdaCk5dRNi1XPnMKFXkYb8dszm49dTcQrHtvDZQVK_xmbma0j0xqeenwYxNcmIlqtTfo0Mqa3wTmUEJfE4Ia_jWz_ZTrV7N2ONsBS-F1IfeY3UEjSquXgguPWkDfW1ZImPadVNn05eByZr_"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1">
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+<h2 class="text-3xl font-bold tracking-tight text-foreground dark:text-dark-foreground">Claims Awaiting Verification</h2>
+<div class="flex items-center gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-border bg-background hover:bg-muted h-10 px-4 py-2 text-muted-foreground dark:border-dark-border dark:bg-dark-background dark:hover:bg-dark-muted dark:text-dark-muted-foreground">
+<span class="material-symbols-outlined mr-2 text-base">filter_list</span>
+                            Filter
+                        </button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 dark:bg-dark-primary dark:text-dark-primary-foreground dark:hover:bg-dark-primary/90">
+<span class="material-symbols-outlined mr-2 text-base">add</span>
+                            New Claim
+                        </button>
+</div>
+</div>
+<div class="rounded-2xl bg-card shadow-soft dark:bg-dark-card dark:shadow-soft-md overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-muted dark:bg-dark-muted">
+<tr>
+<th class="p-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Claim ID</th>
+<th class="p-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Claimant Name</th>
+<th class="p-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Submission Date</th>
+<th class="p-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground">Status</th>
+<th class="p-4 text-sm font-semibold text-muted-foreground dark:text-dark-muted-foreground text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border dark:divide-dark-border">
+<tr class="hover:bg-muted/50 dark:hover:bg-dark-muted/50">
+<td class="p-4 whitespace-nowrap text-sm font-medium text-foreground dark:text-dark-foreground">#2024-001</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">Sophia Clark</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">2024-07-26</td>
+<td class="p-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2.5 py-0.5 text-xs font-medium text-warning-foreground dark:bg-dark-warning/20 dark:text-dark-warning">
+<svg class="mr-1.5 h-2 w-2 text-warning dark:text-dark-warning" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg>
+                                            Pending
+                                        </span>
+</td>
+<td class="p-4 whitespace-nowrap text-sm font-medium text-right">
+<div class="flex justify-end gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground dark:text-dark-muted-foreground dark:hover:bg-dark-muted dark:hover:text-dark-foreground" title="View">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-success hover:bg-success/10 dark:text-dark-success dark:hover:bg-dark-success/20" title="Recommend Approve">
+<span class="material-symbols-outlined text-xl">thumb_up</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-danger hover:bg-danger/10 dark:text-dark-danger dark:hover:bg-dark-danger/20" title="Recommend Reject">
+<span class="material-symbols-outlined text-xl">thumb_down</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-muted/50 dark:hover:bg-dark-muted/50">
+<td class="p-4 whitespace-nowrap text-sm font-medium text-foreground dark:text-dark-foreground">#2024-002</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">Ethan Bennett</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">2024-07-25</td>
+<td class="p-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2.5 py-0.5 text-xs font-medium text-warning-foreground dark:bg-dark-warning/20 dark:text-dark-warning">
+<svg class="mr-1.5 h-2 w-2 text-warning dark:text-dark-warning" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg>
+                                            Pending
+                                        </span>
+</td>
+<td class="p-4 whitespace-nowrap text-sm font-medium text-right">
+<div class="flex justify-end gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground dark:text-dark-muted-foreground dark:hover:bg-dark-muted dark:hover:text-dark-foreground" title="View">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-success hover:bg-success/10 dark:text-dark-success dark:hover:bg-dark-success/20" title="Recommend Approve">
+<span class="material-symbols-outlined text-xl">thumb_up</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-danger hover:bg-danger/10 dark:text-dark-danger dark:hover:bg-dark-danger/20" title="Recommend Reject">
+<span class="material-symbols-outlined text-xl">thumb_down</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-muted/50 dark:hover:bg-dark-muted/50">
+<td class="p-4 whitespace-nowrap text-sm font-medium text-foreground dark:text-dark-foreground">#2024-003</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">Olivia Carter</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">2024-07-24</td>
+<td class="p-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2.5 py-0.5 text-xs font-medium text-warning-foreground dark:bg-dark-warning/20 dark:text-dark-warning">
+<svg class="mr-1.5 h-2 w-2 text-warning dark:text-dark-warning" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg>
+                                            Pending
+                                        </span>
+</td>
+<td class="p-4 whitespace-nowrap text-sm font-medium text-right">
+<div class="flex justify-end gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground dark:text-dark-muted-foreground dark:hover:bg-dark-muted dark:hover:text-dark-foreground" title="View">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-success hover:bg-success/10 dark:text-dark-success dark:hover:bg-dark-success/20" title="Recommend Approve">
+<span class="material-symbols-outlined text-xl">thumb_up</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-danger hover:bg-danger/10 dark:text-dark-danger dark:hover:bg-dark-danger/20" title="Recommend Reject">
+<span class="material-symbols-outlined text-xl">thumb_down</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-muted/50 dark:hover:bg-dark-muted/50">
+<td class="p-4 whitespace-nowrap text-sm font-medium text-foreground dark:text-dark-foreground">#2024-004</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">Liam Davis</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">2024-07-23</td>
+<td class="p-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2.5 py-0.5 text-xs font-medium text-warning-foreground dark:bg-dark-warning/20 dark:text-dark-warning">
+<svg class="mr-1.5 h-2 w-2 text-warning dark:text-dark-warning" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg>
+                                            Pending
+                                        </span>
+</td>
+<td class="p-4 whitespace-nowrap text-sm font-medium text-right">
+<div class="flex justify-end gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground dark:text-dark-muted-foreground dark:hover:bg-dark-muted dark:hover:text-dark-foreground" title="View">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-success hover:bg-success/10 dark:text-dark-success dark:hover:bg-dark-success/20" title="Recommend Approve">
+<span class="material-symbols-outlined text-xl">thumb_up</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-danger hover:bg-danger/10 dark:text-dark-danger dark:hover:bg-dark-danger/20" title="Recommend Reject">
+<span class="material-symbols-outlined text-xl">thumb_down</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-muted/50 dark:hover:bg-dark-muted/50">
+<td class="p-4 whitespace-nowrap text-sm font-medium text-foreground dark:text-dark-foreground">#2024-005</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">Ava Evans</td>
+<td class="p-4 whitespace-nowrap text-sm text-muted-foreground dark:text-dark-muted-foreground">2024-07-22</td>
+<td class="p-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-warning/10 px-2.5 py-0.5 text-xs font-medium text-warning-foreground dark:bg-dark-warning/20 dark:text-dark-warning">
+<svg class="mr-1.5 h-2 w-2 text-warning dark:text-dark-warning" fill="currentColor" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3"></circle></svg>
+                                            Pending
+                                        </span>
+</td>
+<td class="p-4 whitespace-nowrap text-sm font-medium text-right">
+<div class="flex justify-end gap-2">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-muted-foreground hover:bg-muted hover:text-foreground dark:text-dark-muted-foreground dark:hover:bg-dark-muted dark:hover:text-dark-foreground" title="View">
+<span class="material-symbols-outlined text-xl">visibility</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-success hover:bg-success/10 dark:text-dark-success dark:hover:bg-dark-success/20" title="Recommend Approve">
+<span class="material-symbols-outlined text-xl">thumb_up</span>
+</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 h-9 w-9 text-danger hover:bg-danger/10 dark:text-dark-danger dark:hover:bg-dark-danger/20" title="Recommend Reject">
+<span class="material-symbols-outlined text-xl">thumb_down</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between border-t border-border p-4 dark:border-dark-border">
+<p class="text-sm text-muted-foreground dark:text-dark-muted-foreground">Showing 1 to 5 of 20 results</p>
+<div class="flex gap-1">
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-border bg-background hover:bg-muted h-9 px-3 text-muted-foreground dark:border-dark-border dark:bg-dark-background dark:hover:bg-dark-muted dark:text-dark-muted-foreground">Previous</button>
+<button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-border bg-background hover:bg-muted h-9 px-3 text-muted-foreground dark:border-dark-border dark:bg-dark-background dark:hover:bg-dark-muted dark:text-dark-muted-foreground">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

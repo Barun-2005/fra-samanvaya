@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<title>FRA Claim Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#123a97',
+              'background-light': '#f6f6f8',
+              'background-dark': '#111621',
+              'foreground-light': '#111827',
+              'foreground-dark': '#f9fafb',
+              'muted-light': '#6b7280',
+              'muted-dark': '#9ca3af',
+              'border-light': '#e5e7eb',
+              'border-dark': '#374151',
+            },
+            fontFamily: {
+              display: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              DEFAULT: '0.5rem',
+              lg: '0.75rem',
+              xl: '1.5rem',
+              full: '9999px',
+            },
+            boxShadow: {
+              soft: '0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05)',
+            },
+          },
+        },
+      };
+    </script>
+<style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-foreground-light dark:text-foreground-dark">
+<div class="flex min-h-screen flex-col">
+<header class="sticky top-0 z-10 border-b border-border-light bg-background-light/80 backdrop-blur-sm dark:border-border-dark dark:bg-background-dark/80">
+<div class="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-primary">
+<svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L3 8v11a1 1 0 001 1h16a1 1 0 001-1V8l-9-6zm0 2.236L18.663 8H5.337L12 4.236zM5 10h14v8H5v-8z"></path>
+<path d="M7 12h4v4H7zm6 0h4v4h-4z"></path>
+</svg>
+<h1 class="text-xl font-bold text-foreground-light dark:text-foreground-dark">FRA Claims</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-muted-light hover:text-primary dark:text-muted-dark dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-bold text-primary" href="#">Claims</a>
+<a class="text-sm font-medium text-muted-light hover:text-primary dark:text-muted-dark dark:hover:text-primary transition-colors" href="#">Schemes</a>
+<a class="text-sm font-medium text-muted-light hover:text-primary dark:text-muted-dark dark:hover:text-primary transition-colors" href="#">Reports</a>
+<a class="text-sm font-medium text-muted-light hover:text-primary dark:text-muted-dark dark:hover:text-primary transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined text-muted-light dark:text-muted-dark cursor-pointer"> notifications </span>
+<span class="absolute -top-1 -right-1 flex h-2 w-2">
+<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+</span>
+</div>
+<div class="size-10 rounded-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDrOS26nH0RDGCQcBe0GgU_ZQ2w8qAcad5qUCOj0wdjm3kBt9oDm3OA2NwGpJdhuDgyiKeket1wsVe-6gNB4cnGev_zS7FGONz8VdqyYfQxEAVROELR42n-0Fz8rI9NKdGQH9nNfr7LuekZS1xlXWyf3pUtvjHY7C8AhdvSZEEbiXTLzYGiPTFQVgOv3Ls991L6SKgxOzQq_yU-ty77LCIWiuUUecIiK74PC6rUV6rbdgbAVyUD9xUduHu64QNhoCy7DXDMlrjehtq4");'></div>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<div class="mx-auto max-w-5xl py-8 px-4 sm:px-6 lg:px-8">
+<div class="mb-6">
+<h1 class="text-3xl font-bold tracking-tight text-foreground-light dark:text-foreground-dark">Claim Details</h1>
+<p class="text-muted-light dark:text-muted-dark mt-1">View and manage claim information for #123456</p>
+</div>
+<div class="bg-background-light dark:bg-background-dark rounded-xl shadow-soft overflow-hidden border border-border-light dark:border-border-dark">
+<div class="border-b border-border-light dark:border-border-dark">
+<div class="flex gap-2 p-2">
+<a class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold bg-primary/10 text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-base">map</span>
+                  Map
+                </a>
+<a class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-light hover:bg-primary/5 dark:text-muted-dark dark:hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-base">history</span>
+                  Audit Trail
+                </a>
+<a class="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-muted-light hover:bg-primary/5 dark:text-muted-dark dark:hover:bg-primary/10 hover:text-primary transition-all duration-200" href="#">
+<span class="material-symbols-outlined text-base">recommend</span>
+                  DSS Recommendations
+                </a>
+</div>
+</div>
+<div class="p-6">
+<div class="w-full aspect-[16/9] bg-cover bg-center rounded-lg overflow-hidden border border-border-light dark:border-border-dark" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBoCKQT6Md9wLMVbwxDSExUmSt8l809nLU2CCH4wbxtHOuutYyTy0mAp2a3PfHouj4lZh5ZKbMCqMhJjQTOOzkq-lByTxWoOMuvyGbsE4xisMQUcKtlZGeje0aWE3_aEZ-hedSSgbGSGI6su9mB-yHWXkIILJa3bqaKWUfzHOVRq-iQHNcgX2ORdGmv_ja4Kf7c0iX0he-YZH3Hr3ZDqJIHTeXUxOM1n_A3du_d0nBIlK0p2pRIjqbZTq8L1e9Zm9Rho5GAOicAQMlh");'></div>
+</div>
+<div class="px-6 pb-6">
+<h2 class="text-xl font-bold text-foreground-light dark:text-foreground-dark mb-4">Claim Information</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Claim ID</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">#123456</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Status</span>
+<span class="inline-flex items-center rounded-full bg-amber-100 dark:bg-amber-900/50 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:text-amber-300">Pending Review</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Submitted Date</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">2024-01-15</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Claimant Name</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">Sophia Carter</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Scheme</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">Agri-Support Scheme</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Land Area</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">150 acres</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Claim Amount</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">$15,000</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Payment Status</span>
+<span class="inline-flex items-center rounded-full bg-rose-100 dark:bg-rose-900/50 px-2.5 py-0.5 text-xs font-medium text-rose-800 dark:text-rose-300">Not Paid</span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h2 class="text-xl font-bold text-foreground-light dark:text-foreground-dark mb-4">Claimant Details</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Address</span>
+<span class="font-medium text-right text-foreground-light dark:text-foreground-dark">123 Oak Street, Springfield, IL</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Contact Number</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">+1-555-123-4567</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Email</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">sophia.carter@email.com</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Bank Details</span>
+<span class="font-medium text-right text-foreground-light dark:text-foreground-dark">Bank of America, Acct: ******321</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">National ID</span>
+<span class="font-medium text-foreground-light dark:text-foreground-dark">ID: ********345</span>
+</div>
+<div class="flex justify-between border-b border-border-light dark:border-border-dark py-3">
+<span class="text-muted-light dark:text-muted-dark">Land Ownership Proof</span>
+<span class="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+<span class="material-symbols-outlined text-base">check_circle</span>
+                    Attached
+                  </span>
+</div>
+</div>
+</div>
+<div class="px-6 pb-6">
+<h2 class="text-xl font-bold text-foreground-light dark:text-foreground-dark mb-4">Attachments</h2>
+<div class="overflow-x-auto rounded border border-border-light dark:border-border-dark">
+<table class="min-w-full text-sm">
+<thead class="bg-background-light dark:bg-black/10">
+<tr>
+<th class="py-3 px-4 text-left font-medium text-muted-light dark:text-muted-dark" scope="col">File Name</th>
+<th class="py-3 px-4 text-left font-medium text-muted-light dark:text-muted-dark" scope="col">Uploaded Date</th>
+<th class="py-3 px-4 text-right font-medium text-muted-light dark:text-muted-dark" scope="col">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr>
+<td class="py-3 px-4 font-medium text-foreground-light dark:text-foreground-dark">Land_Ownership_Proof.pdf</td>
+<td class="py-3 px-4 text-muted-light dark:text-muted-dark">2024-01-15</td>
+<td class="py-3 px-4 text-right">
+<button class="font-semibold text-primary hover:underline">View</button>
+</td>
+</tr>
+<tr>
+<td class="py-3 px-4 font-medium text-foreground-light dark:text-foreground-dark">Supporting_Documents.zip</td>
+<td class="py-3 px-4 text-muted-light dark:text-muted-dark">2024-01-15</td>
+<td class="py-3 px-4 text-right">
+<button class="font-semibold text-primary hover:underline">Download</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto border-t border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark">
+<div class="mx-auto max-w-7xl py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-light dark:text-muted-dark">
+              © 2024 FRA Claim Management. All rights reserved.
+          </div>
+</footer>
+</div>
+
+</body></html>
