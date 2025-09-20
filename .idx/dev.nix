@@ -2,7 +2,7 @@
 # see: https://developers.google.com/idx/guides/customize-idx-env
 {pkgs}: {
   # Which nixpkgs channel to use.
-  channel = "stable-24.05"; # or "unstable"
+  channel = "stable-24.05";
 
   # Use https://search.nixos.org/packages to find packages
   packages = [
@@ -21,36 +21,5 @@
     extensions = [
       "google.gemini-cli-vscode-ide-companion"
     ];
-
-    workspace = {
-      # To run something each time the workspace is (re)started, use the `onStart` hook
-      onStart = {
-        # Kill any zombie node processes that might be hogging ports from previous sessions
-        kill-zombies = "killall -q -s 9 node || true";
-      };
-    };
-
-    # Enable previews and customize configuration
-    previews = {
-      enable = true;
-      previews = {
-        # The Frontend Web Preview
-        web = {
-          command = [ "npm" "run" "dev" ];
-          cwd = "frontend";
-          manager = "web";
-          env = {
-            # This is a special variable from the IDE. It will contain the
-            # public URL of our backend preview service.
-            NEXT_PUBLIC_API_BASE = "$IDES_PREVIEW_BACKEND_URL/api";
-          };
-        };
-        # The Backend API Preview
-        backend = {
-          command = [ "npm" "run" "dev" ];
-          cwd = "backend";
-        };
-      };
-    };
   };
 }
