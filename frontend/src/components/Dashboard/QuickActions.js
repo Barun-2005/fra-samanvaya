@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import Link from 'next/link';
 
 const ActionButton = ({ href, children, className = '' }) => (
-  <Link href={href} className={`block text-center mt-4 w-full bg-primary text-primary-foreground font-semibold py-3 rounded-lg hover:bg-primary/90 transition-colors ${className}`}>
+  <Link href={href} className={`block text-center mt-4 w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-primary/90 transition-colors ${className}`}>
       {children}
   </Link>
 );
