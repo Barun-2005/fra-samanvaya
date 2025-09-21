@@ -6,8 +6,8 @@ export default function Document() {
       <Head>
         <link href="https://fonts.googleapis.com" rel="preconnect" />
         <link href="https://fonts.gstatic.com" rel="preconnect" crossOrigin="true" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
-        <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -16,19 +16,29 @@ export default function Document() {
                 theme: {
                   extend: {
                     colors: {
-                      primary: "#123a97",
+                      // Dashboard Theme
+                      "primary": "#3A5AFF",
+                      "primary-foreground": "#ffffff",
+                      "secondary": "#EEF2FF",
+                      "secondary-foreground": "#3A5AFF",
+                      "background": "#F9FAFB",
+                      "foreground": "#111827",
+                      "card": "#FFFFFF",
+                      "card-foreground": "#111827",
+                      "muted": "#F3F4F6",
+                      "muted-foreground": "#6B7280",
+                      "border": "#E5E7EB",
+                      "ring": "#A4BCFF",
+                      "success": "#10B981",
+                      "success-foreground": "#ffffff",
+                      
+                      // Login Page Theme
+                      'login-primary': '#123a97',
                       "background-light": "#f6f6f8",
-                      "background-dark": "#111621",
                       "foreground-light": "#0e121b",
-                      "foreground-dark": "#f6f6f8",
                       "input-light": "#ffffff",
-                      "input-dark": "#1a2233",
                       "border-light": "#d0d7e6",
-                      "border-dark": "#2c3a54",
                       "placeholder-light": "#4f6596",
-                      "placeholder-dark": "#9ab3d5",
-                      "accent-success-light": "#059669",
-                      "accent-success-dark": "#34d399",
                     },
                     fontFamily: {
                       display: ["Inter", "sans-serif"],
@@ -36,29 +46,16 @@ export default function Document() {
                     borderRadius: {
                       DEFAULT: "0.5rem",
                       lg: "0.75rem",
-                      xl: "1.5rem",
-                      full: "9999px",
+                      xl: "1rem",
+                      "2xl": "1.5rem",
+                      full: "9999px"
                     },
                     boxShadow: {
-                      soft: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
-                    },
+                      'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
+                    }
                   },
                 },
               };
-            `,
-          }}
-        />
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              .form-input {
-                transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-              }
-              .form-input:focus {
-                border-color: #123a97;
-                box-shadow: 0 0 0 3px rgba(18, 58, 151, 0.2);
-                outline: none;
-              }
             `,
           }}
         />

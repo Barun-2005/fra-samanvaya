@@ -7,52 +7,64 @@ dotenv.config({ path: './.env' });
 
 const users = [
   {
-    username: 'superadmin',
-    password: 'password',
-    displayName: 'Super Admin',
-    roles: ['SuperAdmin'],
-    state: 'National',
-    district: 'All'
+    "username": "dataentry",
+    "password": "password",
+    "roles": ["Data Entry Officer"],
+    "employeeId": "EMP001",
+    "fullName": "Ravi Sharma",
+    "email": "ravi.dataentry@example.com",
+    "department": "Claims",
+    "avatarUrl": "/assets/avatars/avatar1.png"
   },
   {
-    username: 'dataentry',
-    password: 'password',
-    displayName: 'Data Entry Officer',
-    roles: ['DataEntry'],
-    state: 'Maharashtra',
-    district: 'Gadchiroli'
+    "username": "verifier",
+    "password": "password",
+    "roles": ["Verification Officer"],
+    "employeeId": "EMP002",
+    "fullName": "Anita Verma",
+    "email": "anita.verifier@example.com",
+    "department": "Verification",
+    "avatarUrl": "/assets/avatars/avatar2.png"
   },
   {
-    username: 'verifier',
-    password: 'password',
-    displayName: 'Verification Officer',
-    roles: ['Verifier'],
-    state: 'Maharashtra',
-    district: 'Gadchiroli'
+    "username": "approver",
+    "password": "password",
+    "roles": ["Approving Authority"],
+    "employeeId": "EMP003",
+    "fullName": "Sanjay Singh",
+    "email": "sanjay.approver@example.com",
+    "department": "District Office",
+    "avatarUrl": "/assets/avatars/avatar3.png"
   },
   {
-    username: 'approver',
-    password: 'password',
-    displayName: 'Approving Authority',
-    roles: ['Approver'],
-    state: 'Maharashtra',
-    district: 'Gadchiroli'
+    "username": "schemeadmin",
+    "password": "password",
+    "roles": ["Scheme Admin"],
+    "employeeId": "EMP004",
+    "fullName": "Meera Iyer",
+    "email": "meera.schemeadmin@example.com",
+    "department": "Schemes",
+    "avatarUrl": "/assets/avatars/avatar4.png"
   },
   {
-    username: 'schemeadmin',
-    password: 'password',
-    displayName: 'Scheme Admin',
-    roles: ['SchemeAdmin'],
-    state: 'National',
-    district: 'All'
+    "username": "ngoviewer",
+    "password": "password",
+    "roles": ["NGO Viewer"],
+    "employeeId": "EMP005",
+    "fullName": "Amit Patel",
+    "email": "amit.ngo@example.com",
+    "department": "External NGO",
+    "avatarUrl": "/assets/avatars/avatar5.png"
   },
   {
-    username: 'ngoviewer',
-    password: 'password',
-    displayName: 'NGO Viewer',
-    roles: ['NGOViewer'],
-    state: 'Maharashtra',
-    district: 'All'
+    "username": "superadmin",
+    "password": "password",
+    "roles": ["Super Admin"],
+    "employeeId": "EMP006",
+    "fullName": "Priya Desai",
+    "email": "priya.superadmin@example.com",
+    "department": "System",
+    "avatarUrl": "/assets/avatars/avatar6.png"
   }
 ];
 
@@ -67,9 +79,9 @@ const seedDB = async () => {
         await user.save();
     }
 
-    console.log('Database seeded with new users!');
+    console.log('Database seeded with 6 new detailed users!');
   } catch (err) {
-    console.error('Error seeding database:', err);
+    console.error('Error seeding database:', err.message);
   } finally {
     mongoose.connection.close();
   }

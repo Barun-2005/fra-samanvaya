@@ -43,16 +43,25 @@ exports.login = async (req, res) => {
             return res.json({ requires2FA: true, tempToken });
         }
   
-        // --- THIS IS THE FIX ---
-        // If login is successful and no 2FA is needed, generate tokens and send success
         generateAndSetTokens(res, user);
         res.status(200).json({ message: 'Login successful' });
-        // --- END OF FIX ---
 
     } catch (error) {
         console.error('Login error:', error);
         res.status(500).json({ message: 'Server error during login' });
     }
+};
+
+exports.logout = (req, res) => {
+    res.cookie('accessToken', '', {
+        httpOnly: true,
+        expires: new Date(0),
+    });
+    res.cookie('refreshToken', '', {
+        httpOnly: true,
+        expires: new Date(0),
+    });
+    res.status(200).json({ message: 'Logged out successfully' });
 };
 
 exports.verify2FA = async (req, res) => {
@@ -80,7 +89,6 @@ exports.verify2FA = async (req, res) => {
             return res.status(401).json({ message: 'Invalid TOTP code' });
         }
 
-        // If 2FA is successful, generate tokens and send success
         generateAndSetTokens(res, user);
         res.status(200).json({ message: 'Verification successful' });
 

@@ -44,7 +44,8 @@ export default function LoginPage() {
                 <h2 className="text-3xl font-bold tracking-tight text-foreground-light dark:text-foreground-dark">Secure Login</h2>
                 <p className="mt-2 text-sm text-placeholder-light dark:text-placeholder-dark">Welcome back, please enter your credentials.</p>
               </div>
-              <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+              {/* --- THIS IS THE FIX for the hydration warning --- */}
+              <form onSubmit={handleSubmit} className="mt-8 space-y-6" suppressHydrationWarning>
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-foreground-light dark:text-foreground-dark" htmlFor="username">Username</label>
@@ -64,6 +65,7 @@ export default function LoginPage() {
                     <label className="text-sm font-medium text-foreground-light dark:text-foreground-dark" htmlFor="password">Password</label>
                     <input
                       value={password}
+                      // --- THIS IS THE FIX for the typo ---
                       onChange={(e) => setPassword(e.target.value)}
                       autoComplete="current-password"
                       className="form-input mt-1 block w-full rounded-lg border-border-light bg-background-light p-4 text-foreground-light placeholder-placeholder-light focus:ring-primary dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark dark:placeholder-placeholder-dark dark:focus:ring-primary"

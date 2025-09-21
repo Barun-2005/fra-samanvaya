@@ -4,16 +4,31 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  displayName: { type: String },
-  // --- THIS IS THE FIX ---
+  
+  // New fields
+  employeeId: { type: String, required: true },
+  fullName: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  department: { type: String },
+  avatarUrl: { type: String },
+
+  // Updated roles enum
   roles: { 
     type: [{ 
       type: String, 
-      enum: ['SuperAdmin', 'DataEntry', 'Verifier', 'Approver', 'SchemeAdmin', 'NGOViewer'] 
+      enum: [
+        'Data Entry Officer', 
+        'Verification Officer', 
+        'Approving Authority', 
+        'Scheme Admin', 
+        'NGO Viewer', 
+        'Super Admin'
+      ] 
     }], 
-    default: ['DataEntry'] 
+    required: true
   },
-  // --- END OF FIX ---
+  
+  // Existing fields
   state: { type: String },
   district: { type: String },
   totpSecret: { type: String },
@@ -22,6 +37,7 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+// --- Existing pre-save and method hooks ---
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
@@ -34,6 +50,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
+// --- End of existing hooks ---
 
 const User = mongoose.model('User', userSchema);
 
