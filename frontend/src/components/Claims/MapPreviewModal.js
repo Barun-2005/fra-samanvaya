@@ -5,17 +5,17 @@ const MapPreviewModal = ({ claim, onClose }) => {
     if (!claim) return null;
   
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-        <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-lg shadow-xl">
-          <h2 className="text-xl font-bold mb-4">Claim Location</h2>
-          <p>Displaying map for Claim ID: {claim.claimId}</p>
+      <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl">
+          <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Claim Location</h2>
+          <p className="text-gray-600 dark:text-gray-300">Displaying map for Claim ID: {claim.claimId}</p>
           <div className="my-4 bg-gray-200 dark:bg-gray-700 h-64 w-96 flex items-center justify-center">
             {/* Placeholder for map */}
-            <p>Map would be here.</p>
+            <p className="text-gray-500 dark:text-gray-400">Map would be here.</p>
           </div>
           <button 
             onClick={onClose}
-            className="rounded-lg border border-border-light bg-surface-light px-3 py-1.5 text-sm font-medium hover:bg-background-light dark:border-border-dark dark:bg-surface-dark dark:hover:bg-background-dark"
+            className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           >
             Close
           </button>

@@ -12,7 +12,7 @@ const ClaimsFilters = ({ onFilterChange }) => {
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       <div className="relative">
         <form onSubmit={handleSearch}>
-          <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-subtle-light dark:text-subtle-dark">
+          <span className="material-symbols-outlined pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-subtle-light dark:text-subtle-dark">
             search
           </span>
           <input
