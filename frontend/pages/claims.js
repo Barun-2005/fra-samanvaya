@@ -33,7 +33,8 @@ const ClaimsPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get('/api/mock/claims', { params: filters });
+      // Corrected URL: Removed '/api' prefix
+      const { data } = await api.get('/mock/claims', { params: filters });
       setClaims(data.claims);
       setPagination(data.pagination);
     } catch (err) {
@@ -58,7 +59,8 @@ const ClaimsPage = () => {
 
   const handleExport = async () => {
     try {
-      const response = await api.get('/api/claims/export', {
+       // Corrected URL: Assuming export also falls under the '/api' base
+      const response = await api.get('/claims/export', {
         params: { ...filters, format: 'csv' },
         responseType: 'blob',
       });
