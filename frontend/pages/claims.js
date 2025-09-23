@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import api from '../src/lib/api';
+import { mockClaims } from '../pages/api/mock/_data'; // Import mock data directly
 import ClaimsFilters from '../src/components/Claims/ClaimsFilters';
 import ClaimsTable from '../src/components/Claims/ClaimsTable';
 import Pagination from '../src/components/Claims/Pagination';
@@ -29,24 +29,40 @@ const ClaimsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClaim, setSelectedClaim] = useState(null);
 
-  const fetchClaims = async () => {
+  // This effect will now run on the client side to filter and paginate the imported data
+  useEffect(() => {
     setLoading(true);
     setError(null);
     try {
-      // Corrected URL: Removed '/api' prefix
-      const { data } = await api.get('/mock/claims', { params: filters });
-      setClaims(data.claims);
-      setPagination(data.pagination);
+      // Apply filtering
+      const filteredClaims = mockClaims.filter(claim => {
+        return (
+          (filters.q ? claim.claimantName.toLowerCase().includes(filters.q.toLowerCase()) || claim.claimId.toLowerCase().includes(filters.q.toLowerCase()) : true) &&
+          (filters.village ? claim.village === filters.village : true) &&
+          (filters.claimType ? claim.claimType === filters.claimType : true) &&
+          (filters.status ? claim.status === filters.status : true)
+        );
+      });
+
+      // Apply pagination
+      const total = filteredClaims.length;
+      const pages = Math.ceil(total / filters.limit);
+      const startIndex = (filters.page - 1) * filters.limit;
+      const paginatedClaims = filteredClaims.slice(startIndex, startIndex + filters.limit);
+
+      setClaims(paginatedClaims);
+      setPagination({
+        page: filters.page,
+        limit: filters.limit,
+        total,
+        pages,
+      });
     } catch (err) {
-      setError('Failed to fetch claims.');
+      setError('Failed to load or process claims data.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchClaims();
   }, [filters]);
 
   const handleFilterChange = (newFilters) => {
@@ -56,30 +72,15 @@ const ClaimsPage = () => {
   const handlePageChange = (newPage) => {
     setFilters((prev) => ({ ...prev, page: newPage }));
   };
-
-  const handleExport = async () => {
-    try {
-       // Corrected URL: Assuming export also falls under the '/api' base
-      const response = await api.get('/claims/export', {
-        params: { ...filters, format: 'csv' },
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'claims.csv');
-      document.body.appendChild(link);
-      link.click();
-    } catch (error) {
-      console.error('Failed to export CSV', error);
-      alert('Failed to export CSV. Please try again.');
-    }
-  };
   
   const handleGeoIconClick = (claim) => {
     setSelectedClaim(claim);
     setIsModalOpen(true);
   };
+
+  const handleExport = () => {
+      alert("This is a mock action. In a real app, this would export the filtered claims to a CSV file.");
+  }
 
 
   return (

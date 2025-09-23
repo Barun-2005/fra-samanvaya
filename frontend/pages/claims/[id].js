@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import api from '../../../src/lib/api';
-import ClaimOverviewCard from '../../../src/components/Claims/ClaimOverviewCard';
-import ClaimTabs from '../../../src/components/Claims/ClaimTabs';
+import ClaimOverviewCard from '../../src/components/Claims/ClaimOverviewCard';
+import ClaimTabs from '../../src/components/Claims/ClaimTabs';
+import { mockClaims } from '../api/mock/_data'; // Import the complete mock data
 
 const ClaimDetailPage = () => {
   const router = useRouter();
@@ -13,35 +13,47 @@ const ClaimDetailPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (id) {
-      const fetchClaim = async () => {
+    // Wait for the router to be ready and the id to be available
+    if (router.isReady) {
+      if (id) {
         setLoading(true);
         setError(null);
-        try {
-          const { data } = await api.get(`/mock/claims/${id}`);
-          setClaim(data);
-        } catch (err) {
-          setError('Failed to fetch claim details.');
-          console.error(err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchClaim();
-    }
-  }, [id]);
+        // Find the claim directly from the imported mock data.
+        // The data is already in the correct shape.
+        const foundClaim = mockClaims.find(c => c._id === id);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p className="text-danger-light dark:text-danger-dark">{error}</p>;
-  if (!claim) return <p>Claim not found.</p>;
+        if (foundClaim) {
+          setClaim(foundClaim);
+        } else {
+          setError(`Claim with ID "${id}" not found.`);
+        }
+        setLoading(false);
+      } else {
+        // Handle the case where the router is ready but there's no ID in the URL
+        setError('No claim ID provided.');
+        setLoading(false);
+      }
+    }
+  }, [router.isReady, id]);
+
+  // A more robust loading state
+  if (loading || !router.isReady) {
+      return <p>Loading claim details...</p>;
+  }
+  
+  if (error) {
+      return <p className="text-danger-light dark:text-danger-dark">{error}</p>;
+  }
+
+  if (!claim) {
+      return <p>Claim not found.</p>;
+  }
 
   const handleApprove = () => {
-    // In a real app, this would trigger a PUT/POST request to '/api/claims/:id/approve'
     alert(`Mock Action: Approve claim ${claim.claimId}`);
   };
 
   const handleReject = () => {
-    // In a real app, this would trigger a PUT/POST request to '/api/claims/:id/reject'
     alert(`Mock Action: Reject claim ${claim.claimId}`);
   };
 
