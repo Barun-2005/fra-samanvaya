@@ -1,17 +1,15 @@
-const MapPlaceholder = ({ geojson }) => {
-    return (
-        <div className="relative h-96 w-full rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-            <p className="text-gray-500">TODO: Implement react-leaflet map here.</p>
-            {geojson && <pre className="absolute bottom-2 left-2 text-xs bg-black/50 text-white p-2 rounded">{JSON.stringify(geojson, null, 2)}</pre>}
-        </div>
-    );
-};
+import dynamic from 'next/dynamic';
+import { useMemo } from 'react';
 
+// Dynamically import the LeafletMap component
+const LeafletMap = dynamic(() => import('./LeafletMap'), {
+  ssr: false, // This ensures the component is only rendered on the client side
+});
 
 const MapLayersToggle = ({ onToggle, layers }) => {
     // Dummy component for now
     return (
-        <div className="absolute top-2 right-2 bg-white dark:bg-card-dark p-2 rounded shadow-lg z-10">
+        <div className="absolute top-2 right-2 bg-white dark:bg-card-dark p-2 rounded shadow-lg z-[1000]">
             <h4 className="font-bold mb-2">Layers</h4>
             {/* Dummy layer toggles */}
             <div className="flex items-center gap-2">
@@ -26,12 +24,16 @@ const MapLayersToggle = ({ onToggle, layers }) => {
     )
 }
 
-
 const MapSection = ({ claim }) => {
+    // useMemo helps to avoid re-rendering of the map unnecessarily
+    const mapComponent = useMemo(() => (
+        <LeafletMap geojson={claim.geojson} />
+    ), [claim.geojson]);
+
     return (
         <div className="relative">
             <MapLayersToggle />
-            <MapPlaceholder geojson={claim.geojson} />
+            {mapComponent}
         </div>
     )
 }
