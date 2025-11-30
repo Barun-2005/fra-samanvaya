@@ -1,0 +1,31 @@
+.skeleton {
+    animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+
+.skeletonItem {
+    @apply bg-muted rounded-2xl;
+}
+
+.hero {
+    height: 60px;
+    width: 40%;
+    margin-bottom: 2rem;
+}
+
+.grid {
+    @apply grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6;
+}
+
+.card {
+    height: 120px;
+}
+
+.longCard {
+    height: 200px;
+}

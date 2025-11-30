@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect"/>
+<link as="style" href="https://fonts.googleapis.com/css2?display=swap&amp;family=Inter%3Awght%40400%3B500%3B700%3B900" onload="this.rel='stylesheet'" rel="stylesheet"/>
+<title>Stitch Design</title>
+<link href="data:image/x-icon;base64," rel="icon" type="image/x-icon"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#123a97",
+              "background-light": "#f6f6f8",
+              "background-dark": "#111621",
+            },
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: { DEFAULT: "0.5rem", lg: "1rem", xl: "1.5rem", full: "9999px" },
+          },
+        },
+      };
+    </script>
+<style>
+      .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.5rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5em 1.5em;
+        padding-right: 2.5rem;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="flex h-full min-h-screen w-full">
+<div class="flex flex-1 flex-col @container">
+<div class="flex flex-col gap-8 p-6 @[1024px]:flex-row">
+<div class="flex w-full flex-col gap-4 rounded-xl bg-background-light p-6 shadow-sm dark:bg-background-dark @[1024px]:w-[384px]">
+<div class="flex flex-col gap-2">
+<h1 class="text-2xl font-bold text-slate-800 dark:text-white">Bulk Verification and Tagging</h1>
+<p class="text-sm text-slate-600 dark:text-slate-400">Use the map to select multiple claims for bulk actions.</p>
+</div>
+<div class="flex flex-col gap-4">
+<div>
+<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300" for="bulk-action">Bulk Action</label>
+<select class="form-select w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-400" id="bulk-action">
+<option>Select Action</option>
+<option value="verify">Verify</option>
+<option value="reject">Reject</option>
+<option value="review">Mark for Review</option>
+</select>
+</div>
+<div>
+<label class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300" for="bulk-tag">Assign Tag</label>
+<select class="form-select w-full rounded-lg border border-slate-300 bg-white p-3 text-slate-900 focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-400" id="bulk-tag">
+<option>Select Tag</option>
+<option value="high-priority">High Priority</option>
+<option value="low-priority">Low Priority</option>
+<option value="disputed">Disputed</option>
+</select>
+</div>
+<button class="w-full rounded-lg bg-primary py-3 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                Apply Actions
+              </button>
+</div>
+</div>
+<div class="flex flex-1 flex-col gap-6">
+<div class="relative h-[400px] w-full overflow-hidden rounded-xl shadow-sm @[768px]:h-[500px]">
+<div class="absolute inset-0 h-full w-full bg-cover bg-center" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDUZ2JacKOoyFZU2gqgfKbTsezK0Z07sCLjV_ckz8WkkSEyHNczdTUtiyKfviyVGoXX1aViaVxoCOm1g4jr7RAqKfRFSBmhZzT2krnZ80RS15kJw8FduzKhvD9MwFWt5xpzvT9_VVUnad3Jc7SvLdu9jRTgXEnOop9aCu2vkxnZtGQq6F2j1jZFJYky2zxpD0svyXccHJghxxagDmNYo2nLJOtX67H2bT34uzR3Gcx48vZ2987z_lCS7jeiMJ6w55Ov8SuudKritGpP");'></div>
+<div class="absolute left-4 top-4 w-full max-w-sm">
+<div class="relative">
+<div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="h-5 w-5 text-slate-500 dark:text-slate-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" fill-rule="evenodd"></path>
+</svg>
+</div>
+<input class="w-full rounded-lg border-slate-300 bg-background-light py-2.5 pl-10 pr-3 text-slate-900 shadow-sm focus:border-primary focus:ring-primary dark:border-slate-700 dark:bg-background-dark dark:text-white dark:placeholder-slate-400" placeholder="Search for a location" type="text"/>
+</div>
+</div>
+<div class="absolute bottom-4 right-4 flex flex-col gap-2">
+<div class="flex flex-col overflow-hidden rounded-lg bg-background-light shadow-sm dark:bg-background-dark">
+<button aria-label="Zoom in" class="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+<hr class="border-slate-200 dark:border-slate-700"/>
+<button aria-label="Zoom out" class="p-2 text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M18 12H6" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</button>
+</div>
+<button aria-label="My location" class="rounded-lg bg-background-light p-2 text-slate-600 shadow-sm hover:bg-slate-200 dark:bg-background-dark dark:text-slate-300 dark:hover:bg-slate-700">
+<svg class="h-6 w-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+</svg>
+</button>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h2 class="text-xl font-bold text-slate-800 dark:text-white">Audit Log</h2>
+<div class="w-full overflow-hidden rounded-xl border border-slate-200 bg-background-light shadow-sm dark:border-slate-800 dark:bg-background-dark">
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<thead class="bg-slate-100 text-left text-slate-600 dark:bg-slate-900/50 dark:text-slate-400">
+<tr>
+<th class="px-4 py-3 font-medium">Timestamp</th>
+<th class="px-4 py-3 font-medium">User</th>
+<th class="px-4 py-3 font-medium">Action</th>
+<th class="px-4 py-3 font-medium">Details</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+<tr class="text-slate-700 dark:text-slate-300">
+<td class="whitespace-nowrap px-4 py-3">2024-07-26 14:30</td>
+<td class="whitespace-nowrap px-4 py-3">Sophie Dubois</td>
+<td class="whitespace-nowrap px-4 py-3">Status Update</td>
+<td class="whitespace-nowrap px-4 py-3">Updated status to 'Verified'</td>
+</tr>
+<tr class="text-slate-700 dark:text-slate-300">
+<td class="whitespace-nowrap px-4 py-3">2024-07-26 14:35</td>
+<td class="whitespace-nowrap px-4 py-3">Antoine Martin</td>
+<td class="whitespace-nowrap px-4 py-3">Tag Added</td>
+<td class="whitespace-nowrap px-4 py-3">Added tag 'High Priority'</td>
+</tr>
+<tr class="text-slate-700 dark:text-slate-300">
+<td class="whitespace-nowrap px-4 py-3">2024-07-26 14:40</td>
+<td class="whitespace-nowrap px-4 py-3">Sophie Dubois</td>
+<td class="whitespace-nowrap px-4 py-3">Status Update</td>
+<td class="whitespace-nowrap px-4 py-3">Updated status to 'Pending Review'</td>
+</tr>
+<tr class="text-slate-700 dark:text-slate-300">
+<td class="whitespace-nowrap px-4 py-3">2024-07-26 14:45</td>
+<td class="whitespace-nowrap px-4 py-3">Antoine Martin</td>
+<td class="whitespace-nowrap px-4 py-3">Tag Removed</td>
+<td class="whitespace-nowrap px-4 py-3">Removed tag 'Low Priority'</td>
+</tr>
+<tr class="text-slate-700 dark:text-slate-300">
+<td class="whitespace-nowrap px-4 py-3">2024-07-26 14:50</td>
+<td class="whitespace-nowrap px-4 py-3">Sophie Dubois</td>
+<td class="whitespace-nowrap px-4 py-3">Status Update</td>
+<td class="whitespace-nowrap px-4 py-3">Updated status to 'Verified'</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

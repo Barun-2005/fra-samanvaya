@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FRA Claim Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#123a97",
+              "background-light": "#f6f6f8",
+              "background-dark": "#111621",
+            },
+            fontFamily: {
+              display: ["Inter"],
+            },
+            borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+          },
+        },
+      };
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+      }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex h-screen">
+<aside class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+<div class="h-16 flex items-center px-6 gap-3">
+<div class="w-8 h-8 flex items-center justify-center text-primary">
+<svg fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h1 class="text-lg font-bold text-gray-900 dark:text-white">FRA Claims</h1>
+</div>
+<div class="flex-grow px-4 py-6">
+<div class="mb-6">
+<h2 class="px-2 text-sm font-semibold text-gray-500 dark:text-gray-400">Analyst</h2>
+<p class="px-2 text-xs text-gray-400 dark:text-gray-500">Read-only Access</p>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary font-semibold" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" href="#">
+<span class="material-symbols-outlined">map</span>
+<span>Claims</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" href="#">
+<span class="material-symbols-outlined">database</span>
+<span>Datasets</span>
+</a>
+</nav>
+</div>
+</aside>
+<div class="flex-1 flex flex-col overflow-hidden">
+<header class="h-16 shrink-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6">
+<div>
+<h1 class="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="User avatar" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgoBhK27jBWBZUDHRtZVFjXfD7cC-XWVwdiC4GBuun3tFzcs3tBQ9nyWTqS88FguuM-qvEw_03yqS4gqapPkxa-uZF2YcHnBrntCcg-Medvp4ekJ-kwkjR-GMXALWzYZVncXY6wz_1-UaBkb-8C9K8QuILbsXbAkGBhA8bOBP4l18zooaP4ac5ndotNnqr0BVkyG0GDlh6aQNUE8HdmWZxERD7gLc8q9QDy8_iW1vaIn9jtkLGs_yvRtXVSdtItPygG2T9kv4rjyPt"/>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10">
+<div class="max-w-7xl mx-auto">
+<section>
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Overview</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-400">Total Claims</p>
+<p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">1,234</p>
+</div>
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-400">Claims in Review</p>
+<p class="text-3xl font-bold text-amber-500">345</p>
+</div>
+<div class="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800">
+<p class="text-base font-medium text-gray-600 dark:text-gray-400">Claims Approved</p>
+<p class="text-3xl font-bold text-emerald-500">889</p>
+</div>
+</div>
+</section>
+<section class="mt-10">
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Claims Map</h2>
+<div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden">
+<img alt="Claims Map" class="w-full h-auto object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCmuD48swTnePO8f03bsoCw8x0zqPgNlAFFXJD0ilV6YEJrGl7FdJYaaht3fB-xFr8B3YqQ2m9HqrEJ5x2Zk1RKi2XpWJrPU5deDYE-ZpzJWVudIc_lf8-GqSzIer2xWbjRimW2LwMJ7-RD7Jh2NAthHtFZ69QLItbpf1-yyqEjybvFk_-ZWXFZetLpctpJZtlXysAEF-FpY6BUviENODy20ONMzJRijmXB-xwhjlfvTfglghGG1GbLI5IuyperpYhyoA5tZXpfQGtQ"/>
+</div>
+</section>
+<section class="mt-10">
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recent Claims</h2>
+<div class="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-gray-50 dark:bg-gray-800">
+<tr>
+<th class="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Claim ID</th>
+<th class="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Applicant Name</th>
+<th class="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Status</th>
+<th class="px-6 py-4 text-sm font-semibold text-gray-600 dark:text-gray-300">Submission Date</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#12345</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Rajesh Kumar</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300"> In Review </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-08-15</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#12346</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Priya Sharma</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300"> Approved </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-08-10</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#12347</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Amit Singh</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300"> In Review </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-08-05</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#12348</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Sunita Verma</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300"> Approved </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-07-30</td>
+</tr>
+<tr>
+<td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">#12349</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">Vikram Patel</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300"> In Review </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">2023-07-25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section class="mt-10">
+<h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Open Datasets</h2>
+<button class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-lg flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined">download</span>
+<span>Download Datasets</span>
+</button>
+</section>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>
