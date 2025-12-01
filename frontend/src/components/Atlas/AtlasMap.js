@@ -66,15 +66,15 @@ export default function AtlasMap() {
 
             {loading && (
                 <div className="p-8 text-center bg-muted/30 rounded-xl animate-pulse">
-                    <div className="text-lg font-medium text-foreground">🤖 Gemini is analyzing satellite data...</div>
-                    <p className="text-sm text-muted-foreground mt-2">Calculating land cover and aggregating claim stats.</p>
+                    <div className="text-lg font-medium text-foreground">Analyzing Satellite Imagery...</div>
+                    <p className="text-sm text-muted-foreground mt-2">Processing land cover classification and aggregating claim statistics.</p>
                 </div>
             )}
 
             {analysis && (
                 <div className="bg-card border border-border rounded-xl p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-foreground">Regional Analysis Report 🗺️</h2>
+                        <h2 className="text-2xl font-bold text-foreground">Regional Analysis Report</h2>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${analysis.transparencyScore > 70 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                             }`}>
                             Transparency Score: {analysis.transparencyScore}/100

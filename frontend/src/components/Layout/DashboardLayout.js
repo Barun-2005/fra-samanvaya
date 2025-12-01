@@ -6,12 +6,19 @@ export default function DashboardLayout({ children }) {
     const { user } = useAuth();
 
     return (
-        <div className="flex min-h-screen bg-background">
+        <div className="relative flex min-h-screen w-full bg-background-light dark:bg-background-dark">
+            {/* Sidebar */}
             <Sidebar />
-            <div className="flex-1 overflow-auto">
+
+            {/* Main Content */}
+            <main className="flex-1 p-8 overflow-y-auto">
                 {children}
+            </main>
+
+            {/* FraBot FAB - Fixed Bottom Right */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <FraBot />
             </div>
-            <FraBot />
         </div>
     );
 }

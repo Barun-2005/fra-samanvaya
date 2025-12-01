@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verification Officer Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3860ff",
+              "background-light": "#f5f6f8",
+              "background-dark": "#0f1323",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full">
+<!-- SideNavBar -->
+<aside class="flex flex-col w-64 p-4 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 mb-8">
+<div class="flex items-center justify-center size-10 bg-primary/10 text-primary rounded-lg">
+<span class="material-symbols-outlined">forest</span>
+</div>
+<h1 class="text-lg font-bold text-slate-800 dark:text-white">FRA Samanvay</h1>
+</div>
+<div class="flex-1 flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Profile picture of R. Sharma" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCwqdHEojLZ_Ji_85X8FGGLocvKTs_ClN2CVM0AnPUm_p4665coBYb0AhCNx1mJY2hsWYhjKwpXiCb0TVbaxd-F9BhWEDT8_bC1w0pglo6nti2DspRTForLh8LY_uagha8kSps5I3ne6gqJyv6LTdm79Ro-0hdFjzkrRkoKnP67qpuUeOle_Cz5I5SmGtQOnf0HTkqUnIPrN9zbOneGeY3fv4wepW00Y2Fyy5fPVhpARfYx68QeH4h8Q2Wph1bBXvqkthQJx-2cHxQ");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-medium leading-normal">R. Sharma</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Verification Officer</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<p class="text-sm font-medium leading-normal">Claims</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-medium leading-normal">Reports</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#">
+<span class="material-symbols-outlined">map</span>
+<p class="text-sm font-medium leading-normal">Map View</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex p-6 lg:p-8">
+<div class="flex-1 max-w-full">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+<div class="flex flex-col gap-1">
+<p class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">Verification Officer Dashboard</p>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Review and process pending forest rights claims.</p>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] gap-2">
+<span class="material-symbols-outlined">download</span>
+<span class="truncate">Export Data</span>
+</button>
+</div>
+<div class="flex flex-col lg:flex-row gap-6">
+<!-- Verification Queue Section -->
+<div class="flex-grow flex flex-col gap-4">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-4 sm:p-6">
+<!-- SectionHeader -->
+<h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] pb-4">Verification Queue</h2>
+<!-- Table -->
+<div class="@container">
+<div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-800">
+<table class="w-full text-sm text-left">
+<thead class="bg-slate-50 dark:bg-slate-800">
+<tr>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300" scope="col">Claim ID</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300" scope="col">Claimant</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300" scope="col">Village</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 text-right" scope="col">Land Size (Acres)</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300" scope="col">Veracity Score</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300 text-center" scope="col">Priority</th>
+<th class="px-4 py-3 font-medium text-slate-600 dark:text-slate-300" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+<td class="h-[72px] px-4 py-2 text-primary font-medium">FRA-00123</td>
+<td class="h-[72px] px-4 py-2 text-slate-800 dark:text-slate-200">Anjali Singh</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400">Kondagaon</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400 text-right">4.5</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-3">
+<div class="w-20 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 h-1.5"><div class="h-full rounded-full bg-green-500" style="width: 92%;"></div></div>
+<p class="text-slate-800 dark:text-slate-200 text-sm font-medium">92</p>
+</div>
+</td>
+<td class="h-[72px] px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center rounded-full h-7 px-3 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xs font-semibold">High Risk</span>
+</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">verified</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-xl">cancel</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">transfer_within_a_station</span></button>
+</div>
+</td>
+</tr>
+<tr class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+<td class="h-[72px] px-4 py-2 text-primary font-medium">FRA-00124</td>
+<td class="h-[72px] px-4 py-2 text-slate-800 dark:text-slate-200">Ramesh Kumar</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400">Bastar</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400 text-right">2.1</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-3">
+<div class="w-20 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 h-1.5"><div class="h-full rounded-full bg-green-500" style="width: 75%;"></div></div>
+<p class="text-slate-800 dark:text-slate-200 text-sm font-medium">75</p>
+</div>
+</td>
+<td class="h-[72px] px-4 py-2 text-center"></td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">verified</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-xl">cancel</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">transfer_within_a_station</span></button>
+</div>
+</td>
+</tr>
+<tr class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+<td class="h-[72px] px-4 py-2 text-primary font-medium">FRA-00125</td>
+<td class="h-[72px] px-4 py-2 text-slate-800 dark:text-slate-200">Sunita Devi</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400">Narayanpur</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400 text-right">10.0</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-3">
+<div class="w-20 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 h-1.5"><div class="h-full rounded-full bg-amber-500" style="width: 45%;"></div></div>
+<p class="text-slate-800 dark:text-slate-200 text-sm font-medium">45</p>
+</div>
+</td>
+<td class="h-[72px] px-4 py-2 text-center">
+<span class="inline-flex items-center justify-center rounded-full h-7 px-3 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xs font-semibold">High Risk</span>
+</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">verified</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-xl">cancel</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">transfer_within_a_station</span></button>
+</div>
+</td>
+</tr>
+<tr class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+<td class="h-[72px] px-4 py-2 text-primary font-medium">FRA-00126</td>
+<td class="h-[72px] px-4 py-2 text-slate-800 dark:text-slate-200">Vikram Patel</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400">Sukma</td>
+<td class="h-[72px] px-4 py-2 text-slate-500 dark:text-slate-400 text-right">3.2</td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-3">
+<div class="w-20 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 h-1.5"><div class="h-full rounded-full bg-green-500" style="width: 88%;"></div></div>
+<p class="text-slate-800 dark:text-slate-200 text-sm font-medium">88</p>
+</div>
+</td>
+<td class="h-[72px] px-4 py-2 text-center"></td>
+<td class="h-[72px] px-4 py-2">
+<div class="flex items-center gap-2">
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">verified</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-red-500"><span class="material-symbols-outlined text-xl">cancel</span></button>
+<button class="text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-primary"><span class="material-symbols-outlined text-xl">transfer_within_a_station</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-center pt-4">
+<a class="flex size-10 items-center justify-center text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-lg">chevron_left</span>
+</a>
+<a class="text-sm font-bold flex size-10 items-center justify-center text-white rounded-full bg-primary" href="#">1</a>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" href="#">2</a>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" href="#">3</a>
+<span class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-300 rounded-full">...</span>
+<a class="text-sm font-normal flex size-10 items-center justify-center text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" href="#">10</a>
+<a class="flex size-10 items-center justify-center text-slate-500 dark:text-slate-400" href="#">
+<span class="material-symbols-outlined text-lg">chevron_right</span>
+</a>
+</div>
+</div>
+</div>
+<!-- AI Insights Sidebar -->
+<aside class="w-full lg:w-80 flex-shrink-0 flex flex-col gap-6">
+<div class="bg-white dark:bg-slate-900 rounded-xl p-6">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white mb-4">AI Insights</h3>
+<!-- Veracity Score Distribution Card -->
+<div class="mb-6">
+<h4 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Veracity Score Distribution</h4>
+<div class="flex items-end gap-2 h-24">
+<div class="flex-1 bg-red-200 dark:bg-red-800/50 rounded-t" data-alt="Bar chart showing low veracity scores" style="height: 30%;"></div>
+<div class="flex-1 bg-amber-200 dark:bg-amber-800/50 rounded-t" data-alt="Bar chart showing medium veracity scores" style="height: 50%;"></div>
+<div class="flex-1 bg-green-200 dark:bg-green-800/50 rounded-t" data-alt="Bar chart showing high veracity scores" style="height: 90%;"></div>
+<div class="flex-1 bg-green-200 dark:bg-green-800/50 rounded-t" data-alt="Bar chart showing high veracity scores" style="height: 75%;"></div>
+<div class="flex-1 bg-amber-200 dark:bg-amber-800/50 rounded-t" data-alt="Bar chart showing medium veracity scores" style="height: 60%;"></div>
+</div>
+</div>
+<!-- Conflict Alerts Card -->
+<div>
+<h4 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Conflict Alerts</h4>
+<div class="flex flex-col gap-3">
+<a class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<div class="flex-shrink-0 mt-1 size-5 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40 text-red-500 dark:text-red-400">
+<span class="material-symbols-outlined text-sm">warning</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-slate-200">FRA-00125</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Potential overlap with claim FRA-00098.</p>
+</div>
+</a>
+<a class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800" href="#">
+<div class="flex-shrink-0 mt-1 size-5 flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40 text-red-500 dark:text-red-400">
+<span class="material-symbols-outlined text-sm">warning</span>
+</div>
+<div>
+<p class="text-sm font-medium text-slate-800 dark:text-slate-200">FRA-00123</p>
+<p class="text-xs text-slate-500 dark:text-slate-400">Claim area is in a restricted zone.</p>
+</div>
+</a>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+</div>
+</body></html>

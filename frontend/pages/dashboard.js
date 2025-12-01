@@ -1,77 +1,54 @@
-import { useAuth } from '../src/context/AuthContext';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import CitizenDashboard from '../src/components/Dashboard/CitizenDashboard';
-import DataEntryDashboard from '../src/components/Dashboard/DataEntryDashboard';
-import VerificationDashboard from '../src/components/Dashboard/VerificationDashboard';
-import ApprovalDashboard from '../src/components/Dashboard/ApprovalDashboard';
-import SchemeAdminDashboard from '../src/components/Dashboard/SchemeAdminDashboard';
-import NGOViewerDashboard from '../src/components/Dashboard/NGOViewerDashboard';
-import SuperAdminDashboard from '../src/components/Dashboard/SuperAdminDashboard';
-import AuthGuard from '../src/components/Layout/AuthGuard';
+import { useRouter } from 'next/router';
+import { useAuth } from '../src/context/AuthContext';
 
-import DashboardLayout from '../src/components/Layout/DashboardLayout';
-
-const Dashboard = () => {
-    const { user, loading } = useAuth();
+export default function DashboardRouter() {
     const router = useRouter();
+    const { user, loading } = useAuth();
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (!loading && user) {
+            // Route based on primary role
+            const primaryRole = user.roles[0];
 
-    // Render dashboard based on role
-    const renderDashboard = () => {
-        if (!user) return null;
-
-        if (user.roles.includes('Citizen')) {
-            return <CitizenDashboard />;
+            switch (primaryRole) {
+                case 'Citizen':
+                    router.replace('/dashboard/citizen');
+                    break;
+                case 'Data Entry Officer':
+                    router.replace('/dashboard/data-entry');
+                    break;
+                case 'Verification Officer':
+                    router.replace('/dashboard/verification');
+                    break;
+                case 'Approving Authority':
+                    router.replace('/dashboard/approving');
+                    break;
+                case 'Scheme Admin':
+                    router.replace('/dashboard/scheme-admin');
+                    break;
+                case 'NGO Viewer':
+                    router.replace('/dashboard/ngo');
+                    break;
+                case 'Super Admin':
+                    router.replace('/dashboard/super-admin');
+                    break;
+                default:
+                    // Fallback to citizen dashboard
+                    router.replace('/dashboard/citizen');
+            }
         }
+    }, [user, loading, router]);
 
-        if (user.roles.includes('Data Entry Officer')) {
-            return <DataEntryDashboard />;
-        }
-
-        if (user.roles.includes('Verification Officer')) {
-            return <VerificationDashboard />;
-        }
-
-        if (user.roles.includes('Approving Authority')) {
-            return <ApprovalDashboard />;
-        }
-
-        if (user.roles.includes('Super Admin')) {
-            return <SuperAdminDashboard />;
-        }
-
-        if (user.roles.includes('Scheme Admin')) {
-            return <SchemeAdminDashboard />;
-        }
-
-        if (user.roles.includes('NGO Viewer')) {
-            return <NGOViewerDashboard />;
-        }
-
-        // Default fallback (shouldn't happen with proper roles)
-        return (
-            <div className="p-8 text-center">
-                <h1 className="text-2xl font-bold">Welcome, {user.fullName}</h1>
-                <p className="mt-2">Your role does not have a specific dashboard yet.</p>
-            </div>
-        );
-    };
-
+    // Show loading state while redirecting
     return (
-        <AuthGuard>
-            <DashboardLayout>
-                {renderDashboard()}
-            </DashboardLayout>
-        </AuthGuard>
+        <div className="flex min-h-screen items-center justify-center bg-background-light dark:bg-background-dark">
+            <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+                <p className="text-lg font-semibold text-slate-700 dark:text-slate-300">
+                    Loading your dashboard...
+                </p>
+            </div>
+        </div>
     );
-};
-
-export default Dashboard;
+}

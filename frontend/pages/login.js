@@ -1,123 +1,150 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../src/context/AuthContext';
+import { Eye, EyeOff, Shield } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function LoginPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
-      const result = await login(username, password);
-
-      if (result.requires2FA) {
-        router.push('/2fa');
-      } else {
-        // Check if there was a redirect target
-        const redirectTo = sessionStorage.getItem('redirectAfterLogin') || '/dashboard';
-        sessionStorage.removeItem('redirectAfterLogin');
-        router.push(redirectTo);
-      }
-    } catch (err) {
-      setError(err.message || 'An error occurred during login.');
+      await login(formData.username, formData.password);
+      toast.success('Login successful!');
+      router.push('/dashboard');
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || error.message || 'Invalid credentials';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-background-light dark:bg-background-dark font-display text-foreground-light dark:text-foreground-dark">
-      <div className="flex min-h-screen flex-col">
-        <header className="border-b border-border-light dark:border-border-dark px-6 py-4">
-          <div className="container mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-                <path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z" fill="currentColor"></path>
-              </svg>
-              <h1 className="text-xl font-bold text-foreground-light dark:text-foreground-dark">FRA Samanvaya Portal</h1>
+    <div className="relative flex min-h-screen w-full flex-col items-center justify-center bg-background-light p-4 overflow-hidden">
+      {/* Background Image with Blur */}
+      <div className="absolute inset-0 z-0">
+        <img
+          className="h-full w-full object-cover object-center blur-sm saturate-50"
+          src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2560&auto=format&fit=crop"
+          alt="Lush green forest"
+        />
+        <div className="absolute inset-0 bg-background-light/50"></div>
+      </div>
+
+      {/* Login Card */}
+      <div className="relative z-10 flex w-full max-w-[500px] flex-col rounded-xl border border-gray-200/50 bg-background-light/80 p-6 sm:p-10 backdrop-blur-md shadow-2xl">
+        {/* Logo & Title */}
+        <div className="flex flex-col items-center">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary flex items-center justify-center">
+              <Shield className="w-6 h-6 text-white" />
             </div>
+            <h1 className="text-[#0d101b] tracking-light text-[32px] font-bold leading-tight">
+              FRA Samanvay
+            </h1>
           </div>
-        </header>
-        <main className="flex flex-1 items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-          <div className="w-full max-w-lg space-y-8">
-            <div className="rounded-xl bg-input-light dark:bg-input-dark shadow-soft border border-border-light dark:border-border-dark p-8 md:p-12">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold tracking-tight text-foreground-light dark:text-foreground-dark">Secure Login</h2>
-                <p className="mt-2 text-sm text-placeholder-light dark:text-placeholder-dark">Welcome back, please enter your credentials.</p>
-              </div>
-              <form onSubmit={handleSubmit} className="mt-8 space-y-6" suppressHydrationWarning>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-foreground-light dark:text-foreground-dark" htmlFor="username">Username</label>
-                    <input
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      autoComplete="username"
-                      className="form-input mt-1 block w-full rounded-lg border-border-light bg-background-light p-4 text-foreground-light placeholder-placeholder-light focus:ring-primary dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark dark:placeholder-placeholder-dark dark:focus:ring-primary"
-                      id="username"
-                      name="username"
-                      placeholder="Enter your username"
-                      required
-                      type="text"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-foreground-light dark:text-foreground-dark" htmlFor="password">Password</label>
-                    <input
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                      className="form-input mt-1 block w-full rounded-lg border-border-light bg-background-light p-4 text-foreground-light placeholder-placeholder-light focus:ring-primary dark:border-border-dark dark:bg-background-dark dark:text-foreground-dark dark:placeholder-placeholder-dark dark:focus:ring-primary"
-                      id="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      required
-                      type="password"
-                    />
-                  </div>
-                </div>
-                {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                <div className="flex items-center justify-between">
-                  <div className="text-sm">
-                    <a className="font-medium text-primary hover:text-primary/80" href="#"> Forgot your password? </a>
-                  </div>
-                </div>
-                <div>
-                  <button
-                    className="group relative flex w-full justify-center rounded-lg border border-transparent bg-primary py-3 px-4 text-sm font-semibold text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-background-dark disabled:opacity-50 disabled:cursor-not-allowed"
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {loading ? 'Logging in...' : 'Login'}
-                  </button>
-                </div>
-              </form>
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-center text-lg font-semibold text-foreground-light dark:text-foreground-dark">Security & Compliance</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center justify-center rounded-xl border border-border-light bg-input-light p-4 shadow-soft dark:border-border-dark dark:bg-input-dark">
-                  <img alt="Security Badge 1" className="h-24 object-contain" src="/assets/security-badge-1.png" />
-                </div>
-                <div className="flex items-center justify-center rounded-xl border border-border-light bg-input-light p-4 shadow-soft dark:border-border-dark dark:bg-input-dark">
-                  <img alt="Security Badge 2" className="h-24 object-contain" src="/assets/security-badge-2.png" />
-                </div>
-              </div>
-            </div>
-            <p className="mt-8 text-center text-xs text-placeholder-light dark:text-placeholder-dark">
-              © 2024 FRA Samanvaya Portal. All rights reserved.<br />
-              Disclaimer: This system is for authorized use only. Unauthorized access or use may result in disciplinary action and/or legal prosecution.
+          <h2 className="text-[#0d101b] text-[22px] font-bold leading-tight tracking-[-0.015em] pt-6 pb-4">
+            Sign in to your Account
+          </h2>
+        </div>
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-4">
+          {/* Username Field */}
+          <label className="flex flex-col w-full">
+            <p className="text-[#0d101b] text-base font-medium leading-normal pb-2">
+              Username
             </p>
+            <input
+              type="text"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d101b] focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#cfd4e7] bg-background-light focus:border-primary h-14 placeholder:text-[#4c5b9a] p-[15px] text-base font-normal leading-normal"
+              placeholder="Enter your username"
+              required
+              disabled={loading}
+            />
+          </label>
+
+          {/* Password Field */}
+          <label className="flex flex-col w-full">
+            <p className="text-[#0d101b] text-base font-medium leading-normal pb-2">
+              Password
+            </p>
+            <div className="relative flex w-full items-center">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-[#0d101b] focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#cfd4e7] bg-background-light focus:border-primary h-14 placeholder:text-[#4c5b9a] p-[15px] pr-12 text-base font-normal leading-normal"
+                placeholder="Enter your password"
+                required
+                disabled={loading}
+              />
+              <div className="absolute right-0 flex h-full items-center pr-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[#4c5b9a] cursor-pointer hover:text-primary transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </label>
+
+          {/* Submit Button */}
+          <div className="flex flex-col gap-4 pt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex min-w-[84px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 bg-primary text-white text-base font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:ring-offset-background-light transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>Logging in...</span>
+                </div>
+              ) : (
+                <span className="truncate">Login</span>
+              )}
+            </button>
           </div>
-        </main>
+        </form>
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t border-gray-200/80">
+          <p className="text-center text-xs text-gray-500">
+            This is an official government portal. For authorized use only.
+          </p>
+        </div>
       </div>
     </div>
   );

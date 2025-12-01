@@ -68,15 +68,19 @@ export default function UserManagementTable() {
                     <tbody className="divide-y divide-border">
                         {users.map((user) => (
                             <tr key={user._id} className="bg-card hover:bg-muted/50 transition-colors">
-                                <td className="px-6 py-4 font-medium text-foreground">{user.name}</td>
+                                <td className="px-6 py-4 font-medium text-foreground">{user.name || user.email}</td>
                                 <td className="px-6 py-4 text-muted-foreground">{user.email}</td>
                                 <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.role === 'SuperAdmin' ? 'bg-purple-100 text-purple-800' :
+                                    {user.role ? (
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${user.role === 'Super Admin' ? 'bg-purple-100 text-purple-800' :
                                             user.role === 'Citizen' ? 'bg-gray-100 text-gray-800' :
                                                 'bg-blue-100 text-blue-800'
-                                        }`}>
-                                        {user.role}
-                                    </span>
+                                            }`}>
+                                            {user.role}
+                                        </span>
+                                    ) : (
+                                        <span className="text-slate-400 text-sm">No role assigned</span>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 text-muted-foreground">{user.district || 'N/A'}</td>
                                 <td className="px-6 py-4">
@@ -90,8 +94,8 @@ export default function UserManagementTable() {
                                         <button
                                             onClick={() => handleStatusChange(user._id, user.status || 'Active')}
                                             className={`text-xs px-3 py-1 rounded border ${user.status === 'Active'
-                                                    ? 'border-red-200 text-red-600 hover:bg-red-50'
-                                                    : 'border-green-200 text-green-600 hover:bg-green-50'
+                                                ? 'border-red-200 text-red-600 hover:bg-red-50'
+                                                : 'border-green-200 text-green-600 hover:bg-green-50'
                                                 }`}
                                         >
                                             {user.status === 'Active' ? 'Deactivate' : 'Activate'}

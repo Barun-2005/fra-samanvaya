@@ -8,12 +8,26 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // From Dashboard
-        'primary': "#3A5AFF",
-        'primary-foreground': "#ffffff",
+        // Gold Standard Colors from stitch_html/citizen_dashboard_1/code.html
+        primary: {
+          DEFAULT: '#4338ca', // indigo-700
+          hover: '#3730a3', // indigo-800
+          focus: '#4f46e5' // indigo-600
+        },
+        "background-light": "#f8fafc", // slate-50
+        "background-dark": "#0f172a", // slate-900
+        "surface-light": "#ffffff",
+        "surface-dark": "#1e293b", // slate-800
+        "text-light-primary": "#0f172a", // slate-900
+        "text-dark-primary": "#f8fafc", // slate-50
+        "text-light-secondary": "#64748b", // slate-500
+        "text-dark-secondary": "#94a3b8", // slate-400
+        "border-light": "#e2e8f0", // slate-200
+        "border-dark": "#334155", // slate-700
+
+        // Legacy/Other colors (keeping for compatibility but overriding main ones)
         'secondary': "#EEF2FF",
         'secondary-foreground': "#3A5AFF",
-        'background': "#F9FAFB",
         'foreground': "#111827",
         'card': "#FFFFFF",
         'card-foreground': "#111827",
@@ -23,21 +37,6 @@ module.exports = {
         'ring': "#A4BCFF",
         'success': "#10B981",
         'success-foreground': "#ffffff",
-        
-        // From Login Page
-        'login-primary': '#123a97',
-        "background-light": "#f6f6f8",
-        "background-dark": "#111621",
-        "foreground-light": "#0e121b",
-        "foreground-dark": "#f6f6f8",
-        "input-light": "#ffffff",
-        "input-dark": "#1a2233",
-        "border-light": "#d0d7e6",
-        "border-dark": "#2c3a54",
-        "placeholder-light": "#4f6596",
-        "placeholder-dark": "#9ab3d5",
-        "accent-success-light": "#059669",
-        "accent-success-dark": "#34d399",
       },
       fontFamily: {
         "display": ["Inter", "sans-serif"]

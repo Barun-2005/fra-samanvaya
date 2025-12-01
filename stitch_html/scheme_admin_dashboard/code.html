@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scheme Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#2b52ee",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101422",
+            },
+            fontFamily: {
+              "display": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full">
+<!-- SideNavBar -->
+<aside class="flex h-screen w-64 flex-col border-r border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-background-dark sticky top-0">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="FRA Samanvay official logo" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8x3GjFqiC6Gxelsyyp9lQGovffETpOiXXAqCXwYE_NrmtVfQlgQj80KO3V8DeRyC1KdYHHRxfXNLCYzpout-UReruIkfA4i8eAIxQd2dfwj23p1LKUggxwvdacxjxpkwc7Z8H35SIUB1fcS0tUQpNZVUS4g5rmiZm0GAE4DmuHkNfqwhH1LcdXk9hBidDEZeXM9EgF3RRZ6O2YPKCDSVEa-0yQlWlghot6W4GriUlh7u-MrqYpf0kZ50WeKq7wFqnkILGkoz7gSg");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal">FRA Samanvay</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Govt. of India</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 mt-6">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">folder</span>
+<p class="text-sm font-medium leading-normal">Claims</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<p class="text-sm font-medium leading-normal">Reports</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<div class="mt-auto flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8">
+<div class="max-w-7xl mx-auto">
+<!-- PageHeading -->
+<header class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<p class="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">Scheme Administration</p>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-6 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-background-dark">
+<span class="truncate">Add New Scheme</span>
+</button>
+</header>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Left Column: Map & Simulator -->
+<div class="lg:col-span-2 flex flex-col gap-8">
+<!-- Map Section -->
+<section>
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">Scheme Coverage Overview</h2>
+<div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl object-cover border border-slate-200 dark:border-slate-800" data-alt="A color-coded heatmap of a geographical region indicating scheme coverage intensity." data-location="India" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_1KFw_O6JesL-CbCtMtLF-3cVykj_A8EyTqRg9v7Viei1tUOMomDUpcVha6Tdj5JgdI-boddGfafuUC7lciN3pVu5l2sSTvqKcZBKQMZqsnRpHRcBBykEiWF7yvGXM69ocjPZYPj6UaJTE4OWdXaL8GzymbE1If_K2zb07t-zMbGPk0TR_bUiIUa4uiQvqdm4HAnMabSp5U1KMhWiIGOBe24Si_WDqwmB3NzfCes1-B49JZLP2L4Usxtkf3EKgsse2X2btkZMZ68");'></div>
+</section>
+<!-- Budget Impact Simulator -->
+<section class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-[-0.015em] mb-4">Budget Impact Simulator</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400" for="budget">Budget Adjustment (₹ Crore)</label>
+<input class="w-full rounded-md border-slate-300 bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-white focus:border-primary focus:ring-primary/50" id="budget" placeholder="e.g., 50" type="number"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-slate-600 dark:text-slate-400" for="coverage-slider">Target Scenario</label>
+<input class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer dark:bg-slate-700 accent-primary" id="coverage-slider" max="100" min="0" type="range" value="75"/>
+</div>
+<div class="md:col-span-2">
+<button class="w-full md:w-auto flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-5 bg-primary/10 text-primary text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/20">
+<span class="truncate">Calculate Impact</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Schemes Table -->
+<div class="lg:col-span-1">
+<section class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 h-full">
+<h2 class="text-slate-900 dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] pb-4">All Schemes</h2>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="text-xs text-slate-500 dark:text-slate-400 uppercase bg-slate-50 dark:bg-slate-800">
+<tr>
+<th class="px-4 py-3" scope="col">Scheme Name</th>
+<th class="px-4 py-3" scope="col">Status</th>
+<th class="px-4 py-3" scope="col">Utilization</th>
+</tr>
+</thead>
+<tbody class="text-slate-700 dark:text-slate-300">
+<tr class="border-b dark:border-slate-800">
+<td class="px-4 py-4 font-medium whitespace-nowrap">Van Mitra</td>
+<td class="px-4 py-4"><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Active</span></td>
+<td class="px-4 py-4">
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 75%"></div>
+</div>
+</td>
+</tr>
+<tr class="border-b dark:border-slate-800">
+<td class="px-4 py-4 font-medium whitespace-nowrap">Jal Jeevan</td>
+<td class="px-4 py-4"><span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">Active</span></td>
+<td class="px-4 py-4">
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 45%"></div>
+</div>
+</td>
+</tr>
+<tr class="border-b dark:border-slate-800">
+<td class="px-4 py-4 font-medium whitespace-nowrap">Gram Sadak</td>
+<td class="px-4 py-4"><span class="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Pending</span></td>
+<td class="px-4 py-4">
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 10%"></div>
+</div>
+</td>
+</tr>
+<tr>
+<td class="px-4 py-4 font-medium whitespace-nowrap">Awas Yojana</td>
+<td class="px-4 py-4"><span class="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">Closed</span></td>
+<td class="px-4 py-4">
+<div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+<div class="bg-primary h-2.5 rounded-full" style="width: 100%"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

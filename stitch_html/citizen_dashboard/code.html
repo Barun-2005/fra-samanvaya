@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Citizen Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3860ff",
+              "background-light": "#f5f6f8",
+              "background-dark": "#0f1323",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+<div class="relative flex min-h-screen w-full">
+<!-- SideNavBar -->
+<aside class="sticky top-0 h-screen flex flex-col w-64 bg-white dark:bg-background-dark shadow-sm shrink-0">
+<div class="flex h-full min-h-0 flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-3">
+<span class="material-symbols-outlined text-primary text-3xl">forest</span>
+<h1 class="text-[#0c101d] dark:text-white text-lg font-bold">FRA Samanvay</h1>
+</div>
+<div class="flex flex-col gap-2 pt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined text-primary text-2xl">dashboard</span>
+<p class="text-primary text-sm font-medium leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-2xl">folder_copy</span>
+<p class="text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-sm font-medium leading-normal">My Claims</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-2xl">account_circle</span>
+<p class="text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-sm font-medium leading-normal">Profile</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-2xl">help_outline</span>
+<p class="text-[#0c101d] dark:text-gray-300 group-hover:text-primary text-sm font-medium leading-normal">Help</p>
+</a>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="User avatar of Ravi Kumar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBNLRJw7DuplgyLP4mgQ4yAvrwtbg99V3htNc5fts2QCaC7KsvXxJgg4gP1XKdNYuYBkQjgmmqtFmHtRIvfNRKGABEJUMwL1t9eat6a1VD7Mbr_uwROKasEwtDujIPNSeJiHmsXuGEoTvaJyjffjVoQ26BuvUbcc008Jg5C-tvEypxqOh2jvkCG7yCnlkcapnVdKI330Bs-KYMN-GooSEF7gVZup8EJHVMubPOYCG0lXXuEqHrE_HMl4DAq90gegvB_CHZMY3jPLbs");'></div>
+<div class="flex flex-col">
+<h1 class="text-[#0c101d] dark:text-white text-base font-medium leading-normal">Ravi Kumar</h1>
+<p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Citizen</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 group" href="#">
+<span class="material-symbols-outlined text-[#0c101d] dark:text-gray-300 group-hover:text-red-500 text-2xl">logout</span>
+<p class="text-[#0c101d] dark:text-gray-300 group-hover:text-red-500 text-sm font-medium leading-normal">Logout</p>
+</a>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-7xl mx-auto space-y-8">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-center gap-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-[#0c101d] dark:text-white text-3xl font-bold tracking-tight">Welcome, Ravi!</h1>
+<p class="text-gray-500 dark:text-gray-400 text-base font-normal">Manage your Forest Rights Act (FRA) claims and discover relevant schemes.</p>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-12 px-6 bg-primary text-white text-sm font-bold shadow-sm hover:bg-primary/90 transition-colors">
+<span class="material-symbols-outlined">add_circle_outline</span>
+<span class="truncate">Submit New Claim</span>
+</button>
+</div>
+<!-- Stats -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+<p class="text-[#0c101d] dark:text-gray-300 text-base font-medium">My Claims</p>
+<p class="text-[#0c101d] dark:text-white tracking-light text-4xl font-bold">5</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+<p class="text-[#0c101d] dark:text-gray-300 text-base font-medium">Latest Status</p>
+<p class="text-[#0c101d] dark:text-white tracking-light text-4xl font-bold">Verified</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+<p class="text-[#0c101d] dark:text-gray-300 text-base font-medium">Schemes For You</p>
+<p class="text-[#0c101d] dark:text-white tracking-light text-4xl font-bold">3</p>
+</div>
+</div>
+<!-- Scheme Recommendations -->
+<div>
+<h2 class="text-[#0c101d] dark:text-white text-2xl font-bold tracking-tight pb-4 pt-2">Recommended Schemes for You</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Card 1 -->
+<div class="flex flex-col sm:flex-row items-stretch justify-start rounded-xl shadow-sm bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 overflow-hidden">
+<div class="w-full sm:w-1/3 bg-center bg-no-repeat bg-cover aspect-video sm:aspect-auto" data-alt="A vibrant green field under a clear blue sky" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBo5zqCLvDuuQA7jlF9eltCOKJD7WZ_xZ4z4YtiuAwjGnoiejpVTyC-qjLFW045ODZJJSADnRwkZVdy6mWz-_x-78_5ttmescIUXpCCaLuYpKjeUsCY3YOc791CSRnoEfq4TOP9FMZT0Tm1E_c4-o0ulGXk6EUeK8wIeqp6EkwZSybYoYR6LtK_2z_7t8PWEU6d5VR3GkYLQKdMvB_DL5g3ApqrKK8cEh0za3cKQznpFMriDIAUeoCz8-Qjr5RLB8IylCWQEO7TLPM");'></div>
+<div class="flex w-full flex-col items-stretch justify-center gap-2 p-4">
+<p class="text-primary text-sm font-medium">Agriculture Scheme</p>
+<p class="text-[#0c101d] dark:text-white text-lg font-bold leading-tight">Pradhan Mantri Fasal Bima Yojana</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm">An insurance service for farmers for their yields.</p>
+<div class="flex items-center justify-between gap-3 mt-2">
+<div class="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50 px-3 py-1 text-sm font-medium text-green-700 dark:text-green-300">Eligible</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+<span class="truncate">Learn More</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col sm:flex-row items-stretch justify-start rounded-xl shadow-sm bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 overflow-hidden">
+<div class="w-full sm:w-1/3 bg-center bg-no-repeat bg-cover aspect-video sm:aspect-auto" data-alt="Close up of a solar panel array against a sunny sky" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAUh8i6qojR9u_AC7W7JUWDYNjb68huPPz5wc-Ka4FFa4yVxdu7NSk7dbQ7mh9UJMWg-70ya5rUJnU8zKmOoHCf8priyfpjOJhDNgSt6RJ6Q71OOBNrh7xV8G2YStrXLu_b2PivDU87kxcIYBFnKqqJBl1fuB3m2TQP5VrLPZ3pYhug49fDczWZCMyak0y64OiVdZZos5Ab7QSHGUeJ00o_ziP6JlkntHlSFnGl0gRocI-O5nExxEYDF_i7NmQoTjTz2NHDzfK_578");'></div>
+<div class="flex w-full flex-col items-stretch justify-center gap-2 p-4">
+<p class="text-primary text-sm font-medium">Energy Scheme</p>
+<p class="text-[#0c101d] dark:text-white text-lg font-bold leading-tight">PM-KUSUM Scheme</p>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Promotes solar power for agricultural use.</p>
+<div class="flex items-center justify-between gap-3 mt-2">
+<div class="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50 px-3 py-1 text-sm font-medium text-green-700 dark:text-green-300">Eligible</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+<span class="truncate">Learn More</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Claims Table -->
+<div>
+<h2 class="text-[#0c101d] dark:text-white text-2xl font-bold tracking-tight pb-4 pt-2">My Recent Claims</h2>
+<div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+<thead class="text-xs text-gray-700 dark:text-gray-300 uppercase bg-gray-50 dark:bg-gray-700/50">
+<tr>
+<th class="px-6 py-3" scope="col">Claim ID</th>
+<th class="px-6 py-3" scope="col">Date Submitted</th>
+<th class="px-6 py-3" scope="col">Location</th>
+<th class="px-6 py-3" scope="col">Status</th>
+<th class="px-6 py-3 text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="bg-white dark:bg-gray-800/50 border-b dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap" scope="row">FRA-2023-005</th>
+<td class="px-6 py-4">2023-11-01</td>
+<td class="px-6 py-4">Sundargarh, Odisha</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/50 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-300">Approved</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline">View Details</button>
+</td>
+</tr>
+<tr class="bg-white dark:bg-gray-800/50 border-b dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap" scope="row">FRA-2023-004</th>
+<td class="px-6 py-4">2023-10-15</td>
+<td class="px-6 py-4">Koraput, Odisha</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50 px-3 py-1 text-xs font-medium text-blue-700 dark:text-blue-300">Verified</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline">Track Progress</button>
+</td>
+</tr>
+<tr class="bg-white dark:bg-gray-800/50 border-b dark:border-gray-700">
+<th class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap" scope="row">FRA-2023-003</th>
+<td class="px-6 py-4">2023-09-22</td>
+<td class="px-6 py-4">Mayurbhanj, Odisha</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/50 px-3 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-300">Pending</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline">View Details</button>
+</td>
+</tr>
+<tr class="bg-white dark:bg-gray-800/50">
+<th class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap" scope="row">FRA-2022-002</th>
+<td class="px-6 py-4">2022-08-05</td>
+<td class="px-6 py-4">Kalahandi, Odisha</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50 px-3 py-1 text-xs font-medium text-red-700 dark:text-red-300">Rejected</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:underline">View Details</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

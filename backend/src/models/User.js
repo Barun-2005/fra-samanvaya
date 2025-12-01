@@ -39,6 +39,19 @@ const userSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+// Virtual fields for backward compatibility
+userSchema.virtual('name').get(function () {
+  return this.fullName;
+});
+
+userSchema.virtual('role').get(function () {
+  return this.roles && this.roles.length > 0 ? this.roles[0] : null;
+});
+
+// Ensure virtuals are included in JSON and Object outputs
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
 // --- Existing pre-save and method hooks ---
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {

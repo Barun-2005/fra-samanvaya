@@ -1,22 +1,18 @@
-import { useState, useRef } from 'react';
-import api from '../../lib/api';
+import { useState, useRef, useEffect } from 'react';
+import { Upload, FileText, Check, X, Loader2, Mic, MicOff, Edit2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import api from '../../lib/api'; // Import API client
 
-/**
- * SmartUploadForm - Gemini OCR + Voice Input
- * Allows users to upload documents (Aadhar, land docs) and auto-fills form fields
- * Includes voice input for accessibility
- */
 export default function SmartUploadForm({ onDataExtracted }) {
     const [file, setFile] = useState(null);
-    const [extractedData, setExtractedData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
+    const [scanning, setScanning] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const [scannedData, setScannedData] = useState(null);
     const [isListening, setIsListening] = useState(false);
-    const [activeVoiceField, setActiveVoiceField] = useState(null);
-    const fileInputRef = useRef(null);
-    const recognitionRef = useRef(null);
+    const [activeField, setActiveField] = useState(null);
+    const inputRef = useRef(null);
 
-    // Form fields
+    // Form State
     const [formData, setFormData] = useState({
         claimantName: '',
         aadhaarNumber: '',
@@ -25,130 +21,117 @@ export default function SmartUploadForm({ onDataExtracted }) {
         surveyNumber: '',
         claimType: 'Individual',
         reasonForClaim: '',
-        remarks: '',
+        remarks: ''
     });
 
-    // Track which fields were auto-filled (for yellow highlight)
-    const [autoFilledFields, setAutoFilledFields] = useState(new Set());
-    const [missingFields, setMissingFields] = useState(new Set());
+    // Update parent whenever formData changes
+    useEffect(() => {
+        onDataExtracted(formData);
+    }, [formData, onDataExtracted]);
 
-    // Handle file selection
-    const handleFileChange = (e) => {
-        const selectedFile = e.target.files[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-            setError('');
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === "dragenter" || e.type === "dragover") {
+            setDragActive(true);
+        } else if (e.type === "dragleave") {
+            setDragActive(false);
         }
     };
 
-    // Handle form field changes - CRITICAL: This syncs data to parent
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    };
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        const updatedFormData = {
-            ...formData,
-            [name]: value
-        };
-        setFormData(updatedFormData);
-
-        // IMMEDIATELY notify parent component so validation works!
-        if (onDataExtracted) {
-            onDataExtracted(updatedFormData);
-        }
-
-        // Remove from missing fields if user fills it manually
-        if (missingFields.has(name)) {
-            const updated = new Set(missingFields);
-            updated.delete(name);
-            setMissingFields(updated);
+        e.preventDefault();
+        if (e.target.files && e.target.files[0]) {
+            handleFile(e.target.files[0]);
         }
     };
 
-    // Upload and extract data from document
-    const handleUpload = async () => {
-        if (!file) {
-            setError('Please select a file first');
-            return;
+    const handleFile = (file) => {
+        if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
+            setFile(file);
+            setScannedData(null); // Reset scan on new file
+        } else {
+            toast.error('Please upload a PDF or image file');
         }
+    };
 
-        setLoading(true);
-        setError('');
+    const removeFile = () => {
+        setFile(null);
+        setScannedData(null);
+    };
+
+    const handleScan = async () => {
+        if (!file) return;
+
+        setScanning(true);
+        const toastId = toast.loading('Uploading & Analyzing with Gemini AI...');
 
         try {
-            const formDataObj = new FormData();
-            formDataObj.append('document', file);
+            // Create FormData for file upload
+            const uploadData = new FormData();
+            uploadData.append('document', file);
 
-            const response = await api.post('/documents/extract', formDataObj, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+            // Call the REAL backend endpoint
+            const response = await api.post('/documents/extract', uploadData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
             });
 
-            const data = response.data.extractedData;
-            setExtractedData(data);
+            const { extractedData } = response.data;
 
-            // Auto-fill form fields
-            const updatedFormData = { ...formData };
-            const autoFilled = new Set();
-            const missing = new Set();
+            if (extractedData) {
+                setScannedData(extractedData);
 
-            if (data.claimantName) {
-                updatedFormData.claimantName = data.claimantName;
-                autoFilled.add('claimantName');
+                // Merge extracted data with form state
+                setFormData(prev => ({
+                    ...prev,
+                    claimantName: extractedData.claimantName || prev.claimantName,
+                    aadhaarNumber: extractedData.aadhaarNumber || prev.aadhaarNumber,
+                    village: extractedData.village || prev.village,
+                    landSizeClaimed: extractedData.landSizeClaimed?.toString() || prev.landSizeClaimed,
+                    surveyNumber: extractedData.surveyNumber || prev.surveyNumber,
+                    claimType: extractedData.claimType || prev.claimType,
+                    // Keep existing reason/remarks if user typed them, otherwise use extracted if any
+                    reasonForClaim: prev.reasonForClaim || extractedData.reasonForClaim || '',
+                    remarks: prev.remarks || extractedData.remarks || ''
+                }));
+
+                toast.success('Document analyzed successfully!', { id: toastId });
             } else {
-                missing.add('claimantName');
+                throw new Error('No data extracted');
             }
 
-            if (data.aadhaarNumber) {
-                updatedFormData.aadhaarNumber = data.aadhaarNumber;
-                autoFilled.add('aadhaarNumber');
-            } else {
-                missing.add('aadhaarNumber');
-            }
-
-            if (data.village) {
-                updatedFormData.village = data.village;
-                autoFilled.add('village');
-            } else {
-                missing.add('village');
-            }
-
-            if (data.landSizeClaimed) {
-                updatedFormData.landSizeClaimed = data.landSizeClaimed;
-                autoFilled.add('landSizeClaimed');
-            }
-
-            if (data.surveyNumber) {
-                updatedFormData.surveyNumber = data.surveyNumber;
-                autoFilled.add('surveyNumber');
-            }
-
-            if (data.claimType) {
-                updatedFormData.claimType = data.claimType;
-                autoFilled.add('claimType');
-            }
-
-            setFormData(updatedFormData);
-            setAutoFilledFields(autoFilled);
-            setMissingFields(missing);
-
-            // Pass data to parent component AFTER state is set
-            if (onDataExtracted) {
-                onDataExtracted(updatedFormData);
-            }
-
-        } catch (err) {
-            console.error('OCR extraction error:', err);
-            const backendError = err.response?.data?.error;
-            const message = err.response?.data?.message || 'Failed to extract data.';
-            setError(backendError ? `${message}: ${backendError}` : message);
+        } catch (error) {
+            console.error('Scanning error:', error);
+            toast.error(error.response?.data?.message || 'Failed to analyze document', { id: toastId });
         } finally {
-            setLoading(false);
+            setScanning(false);
         }
     };
 
-    // Initialize Speech Recognition
-    const initSpeechRecognition = () => {
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    // Voice to Text Logic
+    const startListening = (fieldName) => {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.');
-            return null;
+            toast.error('Voice input is not supported in this browser.');
+            return;
         }
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -156,293 +139,290 @@ export default function SmartUploadForm({ onDataExtracted }) {
 
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'en-IN'; // English (India) - supports Hindi-English mix
+        recognition.lang = 'en-IN'; // Indian English
 
-        return recognition;
-    };
-
-    // Start voice input for a specific field
-    const startVoiceInput = (fieldName) => {
-        if (!recognitionRef.current) {
-            recognitionRef.current = initSpeechRecognition();
-            if (!recognitionRef.current) return;
-        }
-
-        const recognition = recognitionRef.current;
-        setActiveVoiceField(fieldName);
-        setIsListening(true);
+        recognition.onstart = () => {
+            setIsListening(true);
+            setActiveField(fieldName);
+            toast.loading('Listening...', { id: 'voice-toast' });
+        };
 
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
-            const updatedFormData = {
-                ...formData,
-                [fieldName]: formData[fieldName] + ' ' + transcript
-            };
-            setFormData(updatedFormData);
-
-            // Notify parent of voice input changes too!
-            if (onDataExtracted) {
-                onDataExtracted(updatedFormData);
-            }
-
-            setIsListening(false);
-            setActiveVoiceField(null);
+            setFormData(prev => ({
+                ...prev,
+                [fieldName]: (prev[fieldName] ? prev[fieldName] + ' ' : '') + transcript
+            }));
+            toast.dismiss('voice-toast');
+            toast.success('Text added!');
         };
 
         recognition.onerror = (event) => {
-            console.error('Speech recognition error:', event.error);
+            console.error('Speech recognition error', event.error);
+            toast.dismiss('voice-toast');
+            toast.error('Could not hear you. Please try again.');
             setIsListening(false);
-            setActiveVoiceField(null);
-            alert('Voice input failed. Please try again.');
+            setActiveField(null);
         };
 
         recognition.onend = () => {
             setIsListening(false);
-            setActiveVoiceField(null);
+            setActiveField(null);
+            toast.dismiss('voice-toast');
         };
 
         recognition.start();
     };
 
-    // Stop voice input
-    const stopVoiceInput = () => {
-        if (recognitionRef.current) {
-            recognitionRef.current.stop();
-        }
-        setIsListening(false);
-        setActiveVoiceField(null);
-    };
-
-    // Get field class based on auto-fill status
-    const getFieldClassName = (fieldName, baseClass) => {
-        if (missingFields.has(fieldName)) {
-            return `${baseClass} border-yellow-400 bg-yellow-50 dark:bg-yellow-900/10`;
-        }
-        if (autoFilledFields.has(fieldName)) {
-            return `${baseClass} border-green-400 bg-green-50 dark:bg-green-900/10`;
-        }
-        return baseClass;
-    };
-
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Upload Section */}
-            <div className="bg-card rounded-xl border-2 border-dashed border-border p-6 text-center">
-                <h3 className="text-lg font-semibold text-foreground mb-2">📄 Upload Document</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                    Upload your Aadhar card or land document. Our AI will auto-fill the form.
-                </p>
+            <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Upload className="w-5 h-5 text-primary" />
+                    1. Upload Document
+                </h3>
 
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={handleFileChange}
-                    className="hidden"
-                />
+                <div
+                    className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${dragActive
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border-light dark:border-border-dark hover:border-primary/50'
+                        }`}
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                >
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        className="hidden"
+                        accept=".pdf,image/*"
+                        onChange={handleChange}
+                    />
 
-                <div className="space-y-3">
-                    <button
-                        onClick={() => fileInputRef.current.click()}
-                        className="px-6 py-3 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/80 transition-colors"
-                    >
-                        {file ? `Selected: ${file.name}` : 'Choose File'}
-                    </button>
-
-                    {file && (
-                        <button
-                            onClick={handleUpload}
-                            disabled={loading}
-                            className="ml-3 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? (
-                                <span className="flex items-center gap-2">
-                                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                                    </svg>
-                                    Scanning...
-                                </span>
-                            ) : (
-                                '✨ Extract Data'
-                            )}
-                        </button>
+                    {!file ? (
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Upload className="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                                <p className="text-lg font-semibold text-slate-900 dark:text-white">
+                                    Upload Claim Document
+                                </p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                                    Drag & drop or click to browse
+                                </p>
+                            </div>
+                            <p className="text-xs text-slate-400">
+                                Supports PDF, JPG, PNG (Max 10MB)
+                            </p>
+                            <button
+                                onClick={() => inputRef.current?.click()}
+                                className="mt-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                            >
+                                Select File
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-left">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                                    <FileText className="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-slate-900 dark:text-white truncate max-w-[200px]">
+                                        {file.name}
+                                    </p>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={removeFile}
+                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-500 hover:text-red-500 rounded-lg transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
                     )}
                 </div>
 
-                {error && (
-                    <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>
-                )}
-
-                {extractedData && (
-                    <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                        <p className="text-sm text-green-700 dark:text-green-400 font-medium">
-                            ✓ Data extracted successfully! Review and edit fields below.
-                        </p>
-                        {missingFields.size > 0 && (
-                            <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
-                                ⚠️ Some fields couldn't be detected (highlighted in yellow)
-                            </p>
-                        )}
+                {file && !scannedData && (
+                    <div className="flex justify-end">
+                        <button
+                            onClick={handleScan}
+                            disabled={scanning}
+                            className="bg-primary hover:bg-primary-hover text-white font-semibold py-2.5 px-6 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+                        >
+                            {scanning ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    Analyzing with Gemini...
+                                </>
+                            ) : (
+                                <>
+                                    <Check className="w-5 h-5" />
+                                    Scan & Auto-fill
+                                </>
+                            )}
+                        </button>
                     </div>
                 )}
             </div>
 
-            {/* Form Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Claimant Name */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Claimant Name *
-                    </label>
-                    <input
-                        type="text"
-                        name="claimantName"
-                        value={formData.claimantName}
-                        onChange={handleChange}
-                        className={getFieldClassName('claimantName', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        placeholder="Enter full name"
-                        required
-                    />
+            {/* Auto-filled Form Section */}
+            <div className={`space-y-6 transition-all duration-500 ${scannedData ? 'opacity-100 translate-y-0' : 'opacity-50 translate-y-4 grayscale'}`}>
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                        <Edit2 className="w-5 h-5 text-primary" />
+                        2. Verify & Edit Details
+                    </h3>
+                    {scannedData && (
+                        <span className="text-xs font-medium bg-green-100 text-green-800 px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <Check className="w-3 h-3" /> Auto-filled by Gemini AI
+                        </span>
+                    )}
                 </div>
 
-                {/* Aadhaar Number */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Aadhaar Number *
-                    </label>
-                    <input
-                        type="text"
-                        name="aadhaarNumber"
-                        value={formData.aadhaarNumber}
-                        onChange={handleChange}
-                        maxLength="12"
-                        className={getFieldClassName('aadhaarNumber', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        placeholder="12-digit Aadhaar"
-                        required
-                    />
-                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Claimant Name */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Claimant Name *</label>
+                        <input
+                            type="text"
+                            name="claimantName"
+                            value={formData.claimantName}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
+                            placeholder="Enter full name"
+                        />
+                    </div>
 
-                {/* Village */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Village *
-                    </label>
-                    <input
-                        type="text"
-                        name="village"
-                        value={formData.village}
-                        onChange={handleChange}
-                        className={getFieldClassName('village', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        placeholder="Village name"
-                        required
-                    />
-                </div>
+                    {/* Aadhaar Number */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Aadhaar Number *</label>
+                        <input
+                            type="text"
+                            name="aadhaarNumber"
+                            value={formData.aadhaarNumber}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
+                            placeholder="XXXX XXXX XXXX"
+                        />
+                    </div>
 
-                {/* Land Size */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Land Size (hectares) *
-                    </label>
-                    <input
-                        type="number"
-                        name="landSizeClaimed"
-                        value={formData.landSizeClaimed}
-                        onChange={handleChange}
-                        step="0.1"
-                        min="0"
-                        className={getFieldClassName('landSizeClaimed', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        placeholder="e.g., 2.5"
-                        required
-                    />
-                </div>
+                    {/* Village */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Village *</label>
+                        <input
+                            type="text"
+                            name="village"
+                            value={formData.village}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
+                            placeholder="Village Name"
+                        />
+                    </div>
 
-                {/* Survey Number */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Survey/Plot Number
-                    </label>
-                    <input
-                        type="text"
-                        name="surveyNumber"
-                        value={formData.surveyNumber}
-                        onChange={handleChange}
-                        className={getFieldClassName('surveyNumber', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        placeholder="Survey number (if known)"
-                    />
-                </div>
+                    {/* Land Size */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Land Size (Hectares) *</label>
+                        <input
+                            type="number"
+                            name="landSizeClaimed"
+                            value={formData.landSizeClaimed}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
+                            placeholder="0.00"
+                        />
+                    </div>
 
-                {/* Claim Type */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1">
-                        Claim Type *
-                    </label>
-                    <select
-                        name="claimType"
-                        value={formData.claimType}
-                        onChange={handleChange}
-                        className={getFieldClassName('claimType', 'form-input w-full rounded-lg border p-3 text-foreground')}
-                        required
-                    >
-                        <option value="Individual">Individual</option>
-                        <option value="Community">Community</option>
-                    </select>
-                </div>
-            </div>
+                    {/* Survey Number */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Survey Number</label>
+                        <input
+                            type="text"
+                            name="surveyNumber"
+                            value={formData.surveyNumber}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
+                            placeholder="Survey / Plot No."
+                        />
+                    </div>
 
-            {/* Voice Input Fields */}
-            <div className="space-y-4">
-                {/* Reason for Claim */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1 flex items-center justify-between">
-                        <span>Reason for Claim *</span>
-                        <button
-                            type="button"
-                            onClick={() => isListening && activeVoiceField === 'reasonForClaim' ? stopVoiceInput() : startVoiceInput('reasonForClaim')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${isListening && activeVoiceField === 'reasonForClaim'
-                                ? 'bg-red-500 text-white animate-pulse'
-                                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                                }`}
-                            title="Voice input (Hindi/English)"
+                    {/* Claim Type */}
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Claim Type *</label>
+                        <select
+                            name="claimType"
+                            value={formData.claimType}
+                            onChange={handleInputChange}
+                            className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary"
                         >
-                            🎙️ {isListening && activeVoiceField === 'reasonForClaim' ? 'Listening...' : 'Voice'}
-                        </button>
-                    </label>
-                    <textarea
-                        name="reasonForClaim"
-                        value={formData.reasonForClaim}
-                        onChange={handleChange}
-                        rows="3"
-                        className="form-input w-full rounded-lg border p-3 text-foreground"
-                        placeholder="Explain why you are making this claim..."
-                        required
-                    />
-                </div>
+                            <option value="Individual">Individual Forest Rights</option>
+                            <option value="Community">Community Forest Rights</option>
+                        </select>
+                    </div>
 
-                {/* Remarks */}
-                <div>
-                    <label className="block text-sm font-medium text-foreground mb-1 flex items-center justify-between">
-                        <span>Additional Remarks</span>
-                        <button
-                            type="button"
-                            onClick={() => isListening && activeVoiceField === 'remarks' ? stopVoiceInput() : startVoiceInput('remarks')}
-                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${isListening && activeVoiceField === 'remarks'
-                                ? 'bg-red-500 text-white animate-pulse'
-                                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                                }`}
-                            title="Voice input (Hindi/English)"
-                        >
-                            🎙️ {isListening && activeVoiceField === 'remarks' ? 'Listening...' : 'Voice'}
-                        </button>
-                    </label>
-                    <textarea
-                        name="remarks"
-                        value={formData.remarks}
-                        onChange={handleChange}
-                        rows="2"
-                        className="form-input w-full rounded-lg border p-3 text-foreground"
-                        placeholder="Any additional information..."
-                    />
+                    {/* Reason for Claim (Voice Enabled) */}
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex justify-between">
+                            Reason for Claim *
+                            <span className="text-xs text-slate-500 font-normal">Click microphone to speak</span>
+                        </label>
+                        <div className="relative">
+                            <textarea
+                                name="reasonForClaim"
+                                value={formData.reasonForClaim}
+                                onChange={handleInputChange}
+                                rows={3}
+                                className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary pr-12"
+                                placeholder="Describe why you are claiming this land..."
+                            />
+                            <button
+                                type="button"
+                                onClick={() => startListening('reasonForClaim')}
+                                className={`absolute right-3 top-3 p-2 rounded-full transition-all ${activeField === 'reasonForClaim'
+                                        ? 'bg-red-100 text-red-600 animate-pulse'
+                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                    }`}
+                                title="Voice Input"
+                            >
+                                {activeField === 'reasonForClaim' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Remarks (Voice Enabled) */}
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 flex justify-between">
+                            Additional Remarks
+                            <span className="text-xs text-slate-500 font-normal">Click microphone to speak</span>
+                        </label>
+                        <div className="relative">
+                            <textarea
+                                name="remarks"
+                                value={formData.remarks}
+                                onChange={handleInputChange}
+                                rows={2}
+                                className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-primary focus:border-primary pr-12"
+                                placeholder="Any other details..."
+                            />
+                            <button
+                                type="button"
+                                onClick={() => startListening('remarks')}
+                                className={`absolute right-3 top-3 p-2 rounded-full transition-all ${activeField === 'remarks'
+                                        ? 'bg-red-100 text-red-600 animate-pulse'
+                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                    }`}
+                                title="Voice Input"
+                            >
+                                {activeField === 'remarks' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

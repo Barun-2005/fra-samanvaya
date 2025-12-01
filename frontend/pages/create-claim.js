@@ -318,7 +318,7 @@ function CreateClaimWizard() {
                   Submitting...
                 </span>
               ) : (
-                '🚀 Submit Claim'
+                'Submit Claim'
               )}
             </button>
           )}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Citizen Dashboard - FRA Samanvay</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#4338ca', // indigo-700
+                            hover: '#3730a3', // indigo-800
+                            focus: '#4f46e5' // indigo-600
+                        },
+                        "background-light": "#f8fafc", // slate-50
+                        "background-dark": "#0f172a", // slate-900
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b", // slate-800
+                        "text-light-primary": "#0f172a", // slate-900
+                        "text-dark-primary": "#f8fafc", // slate-50
+                        "text-light-secondary": "#64748b", // slate-500
+                        "text-dark-secondary": "#94a3b8", // slate-400
+                        "border-light": "#e2e8f0", // slate-200
+                        "border-dark": "#334155", // slate-700
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.5rem", // 8px
+                    },
+                },
+            },
+        };
+    </script>
+<style>
+        .material-icons-outlined {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-text-light-primary dark:text-dark-primary">
+<div class="flex h-screen">
+<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark flex flex-col border-r border-border-light dark:border-border-dark">
+<div class="p-6">
+<a class="flex items-center gap-2" href="#">
+<div class="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+<span class="material-icons-outlined text-primary">landscape</span>
+</div>
+<span class="text-xl font-bold">FRA Samanvay</span>
+</a>
+</div>
+<nav class="flex-1 px-4">
+<ul>
+<li><a class="flex items-center gap-3 px-4 py-2.5 rounded bg-primary/10 text-primary font-semibold" href="#"><span class="material-icons-outlined">dashboard</span>Dashboard</a></li>
+<li><a class="flex items-center gap-3 px-4 py-2.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 text-text-light-secondary dark:text-dark-secondary hover:text-text-light-primary dark:hover:text-dark-primary" href="#"><span class="material-icons-outlined">folder_open</span>My Claims</a></li>
+<li><a class="flex items-center gap-3 px-4 py-2.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 text-text-light-secondary dark:text-dark-secondary hover:text-text-light-primary dark:hover:text-dark-primary" href="#"><span class="material-icons-outlined">person</span>Profile</a></li>
+<li><a class="flex items-center gap-3 px-4 py-2.5 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 text-text-light-secondary dark:text-dark-secondary hover:text-text-light-primary dark:hover:text-dark-primary" href="#"><span class="material-icons-outlined">help_outline</span>Help</a></li>
+</ul>
+</nav>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3">
+<img alt="Ravi Kumar's profile picture" class="w-10 h-10 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvzX77T4UxtYBlymqCrGZzT1-Vrz3E9ekEDYLjQ9pLhjDq5VniAoR4mwE2UHEmAAYazE3jVlgTKYZpwbLqvOIrHZxHqxs-9KRkx8UYPK-c8P2iyTwBSaV4cnmqWnY8GuER8toNjCFMa4Z7XuI0S7Sy4KG9lGuV6feYUV6LAIIkKtcFYy0ehM2PFjo-keiW28kKW4X9oPJJz9Ce4-Y2Tyz6IgMIxSNk0xZfY2_SmQ4noczVXGORRiXTcmE8LPMvtPWqyN-mYEQPcwk"/>
+<div>
+<p class="font-semibold">Ravi Kumar</p>
+<p class="text-sm text-text-light-secondary dark:text-dark-secondary">Citizen</p>
+</div>
+<a class="ml-auto text-text-light-secondary dark:text-dark-secondary hover:text-text-light-primary dark:hover:text-dark-primary" href="#">
+<span class="material-icons-outlined">logout</span>
+</a>
+</div>
+</div>
+</aside>
+<main class="flex-1 overflow-y-auto p-8">
+<header class="flex items-center justify-between mb-8">
+<div>
+<h1 class="text-3xl font-bold">Welcome, Ravi!</h1>
+<p class="text-text-light-secondary dark:text-dark-secondary mt-1">Manage your Forest Rights Act (FRA) claims and discover relevant schemes.</p>
+</div>
+<button class="bg-primary hover:bg-primary-hover focus:ring-4 focus:ring-primary-focus/50 text-white font-semibold py-2.5 px-5 rounded-lg flex items-center gap-2 transition-colors">
+<span class="material-icons-outlined" style="font-size: 20px;">add</span>Submit New Claim
+                </button>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg border border-border-light dark:border-border-dark shadow-sm">
+<p class="text-text-light-secondary dark:text-dark-secondary">My Claims</p>
+<p class="text-4xl font-bold mt-2">5</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg border border-border-light dark:border-border-dark shadow-sm">
+<p class="text-text-light-secondary dark:text-dark-secondary">Latest Status</p>
+<p class="text-4xl font-bold mt-2">Verified</p>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark p-6 rounded-lg border border-border-light dark:border-border-dark shadow-sm">
+<p class="text-text-light-secondary dark:text-dark-secondary">Schemes For You</p>
+<p class="text-4xl font-bold mt-2">3</p>
+</div>
+</div>
+<section class="mb-8">
+<h2 class="text-xl font-semibold mb-4">Recommended Schemes for You</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark shadow-sm flex items-center p-4 gap-4">
+<img alt="Lush green wheat field under a clear blue sky" class="w-24 h-24 object-cover rounded" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7uHGTQVIft6EWGx7H9rG9aedYwyE-HdBkyNM0mBegoWGZuGswyALqY0ZgDoD5N_fx69kZiRe4KyENU71QMdqCIa3Tx6Ga74604Hvrethh8KfOhbkrnhMRKtPRYZAiHAQF_jYgnIY_OkWSNQ9WaxlzrQDZDRmn662NgOY3qZ1HJ7vthyXIZTLV12RdKP_of7N7ucy8KUoPxPbQM-6clMlHvSqKmCKQA6fH6kAnbwonGiQ6cc4gjzo6ryWQzo-EbLzKpDqJkDYMNis"/>
+<div class="flex-1">
+<p class="text-sm text-text-light-secondary dark:text-dark-secondary">Agriculture Scheme</p>
+<h3 class="font-semibold text-lg">Pradhan Mantri Fasal Bima Yojana</h3>
+<p class="text-sm text-text-light-secondary dark:text-dark-secondary mt-1">An insurance service for farmers for their yields.</p>
+<div class="flex items-center gap-4 mt-3">
+<span class="text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2.5 py-1 rounded-full">Eligible</span>
+<button class="ml-auto bg-primary/10 text-primary font-semibold py-2 px-4 rounded-lg hover:bg-primary/20 transition-colors text-sm">Learn More</button>
+</div>
+</div>
+</div>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark shadow-sm flex items-center p-4 gap-4">
+<img alt="Solar panels in a field with a bright sun in the background" class="w-24 h-24 object-cover rounded" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTZesmM7_mG5ZDnmjdpOYE-C6dabE9T4T3pd-dlyBUr51K3tz4Iy5zAhIiqDTyauJFOug9CgIrh2ljOCfAbvp80nq02XpYkoolCVXSKKKHZdWikdCGamNskit74Uw3BIOaP2AVdWMKOx1Vn0c3kaDRejfvhuBXxGQjgvBlU8lqJ3xkFsmlHExJZg7uWwZXQmWonSZIAZ_-WQ70hnroMUleaU4wmJU1bEdmjoIwomsvBZAXk7XdDyj-aaSO3a_kKPvQjQqYQBhmy_w"/>
+<div class="flex-1">
+<p class="text-sm text-text-light-secondary dark:text-dark-secondary">Energy Scheme</p>
+<h3 class="font-semibold text-lg">PM-KUSUM Scheme</h3>
+<p class="text-sm text-text-light-secondary dark:text-dark-secondary mt-1">Promotes solar power for agricultural use.</p>
+<div class="flex items-center gap-4 mt-3">
+<span class="text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 px-2.5 py-1 rounded-full">Eligible</span>
+<button class="ml-auto bg-primary/10 text-primary font-semibold py-2 px-4 rounded-lg hover:bg-primary/20 transition-colors text-sm">Learn More</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h2 class="text-xl font-semibold mb-4">My Recent Claims</h2>
+<div class="bg-surface-light dark:bg-surface-dark rounded-lg border border-border-light dark:border-border-dark shadow-sm">
+<table class="w-full text-left">
+<thead class="border-b border-border-light dark:border-border-dark">
+<tr>
+<th class="p-4 font-semibold text-sm text-text-light-secondary dark:text-dark-secondary">CLAIM ID</th>
+<th class="p-4 font-semibold text-sm text-text-light-secondary dark:text-dark-secondary">DATE SUBMITTED</th>
+<th class="p-4 font-semibold text-sm text-text-light-secondary dark:text-dark-secondary">LOCATION</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-border-light dark:border-border-dark">
+<td class="p-4 font-medium">FRA-2023-005</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">2023-11-01</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">Sundargarh, Odisha</td>
+</tr>
+<tr class="border-b border-border-light dark:border-border-dark">
+<td class="p-4 font-medium">FRA-2023-004</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">2023-10-15</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">Koraput, Odisha</td>
+</tr>
+<tr class="border-b border-border-light dark:border-border-dark">
+<td class="p-4 font-medium">FRA-2023-003</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">2023-09-22</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">Mayurbhanj, Odisha</td>
+</tr>
+<tr>
+<td class="p-4 font-medium">FRA-2022-002</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">2022-08-05</td>
+<td class="p-4 text-text-light-secondary dark:text-dark-secondary">Kalahandi, Odisha</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<div class="fixed bottom-8 right-8 w-96">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl flex flex-col h-[500px] border border-border-light dark:border-border-dark">
+<header class="flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3">
+<span class="material-icons-outlined p-1.5 bg-slate-100 dark:bg-slate-700 text-text-light-secondary dark:text-dark-secondary rounded-full" style="font-size: 20px;">support_agent</span>
+<div>
+<h3 class="font-semibold">FRA Assistant</h3>
+</div>
+</div>
+</header>
+<div class="flex-1 p-4 overflow-y-auto space-y-4">
+<div class="flex">
+<div class="bg-slate-100 dark:bg-slate-700/80 rounded-lg rounded-bl-none p-3 max-w-xs">
+<p class="text-sm">Hello, I am the FRA Assistant. I can provide information regarding the Forest Rights Act and the status of your claims. How may I assist you today?</p>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<div class="relative">
+<input class="w-full bg-slate-100 dark:bg-slate-700/80 border-transparent focus:border-primary focus:ring-primary rounded-lg pr-12 text-sm placeholder:text-text-light-secondary placeholder:dark:text-dark-secondary" placeholder="Type your question here..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-md flex items-center justify-center bg-slate-200 dark:bg-slate-600 hover:bg-slate-300 dark:hover:bg-slate-500 text-text-light-primary dark:text-dark-primary transition-colors">
+<span class="material-icons-outlined" style="font-size: 20px;">send</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

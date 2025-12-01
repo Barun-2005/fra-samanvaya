@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NGO Viewer Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#3d63fa",
+              "background-light": "#f5f6f8",
+              "background-dark": "#0f1323",
+            },
+            fontFamily: {
+              "display": ["Public Sans", "sans-serif"]
+            },
+            borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#0d101c] dark:text-gray-200">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-800 px-4 sm:px-6 lg:px-10 py-3 bg-white dark:bg-background-dark sticky top-0 z-10">
+<div class="flex items-center gap-4 text-[#0d101c] dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path clip-rule="evenodd" d="M12.0799 24L4 19.2479L9.95537 8.75216L18.04 13.4961L18.0446 4H29.9554L29.96 13.4961L38.0446 8.75216L44 19.2479L35.92 24L44 28.7521L38.0446 39.2479L29.96 34.5039L29.9554 44H18.0446L18.04 34.5039L9.95537 39.2479L4 28.7521L12.0799 24Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="text-[#0d101c] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">FRA Samanvay</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9">
+<a class="text-primary text-sm font-medium leading-normal border-b-2 border-primary pb-1" href="#">Dashboard</a>
+<a class="text-[#0d101c] dark:text-gray-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal" href="#">GIS Atlas</a>
+<a class="text-[#0d101c] dark:text-gray-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal" href="#">Metrics</a>
+<a class="text-[#0d101c] dark:text-gray-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal" href="#">Impact</a>
+</div>
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+<span class="truncate">Export Data</span>
+</button>
+</div>
+</header>
+<main class="px-4 sm:px-6 lg:px-10 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col w-full max-w-7xl flex-1">
+<div class="flex flex-wrap justify-between items-start gap-4 p-4">
+<p class="text-[#0d101c] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em] min-w-72">NGO Viewer Dashboard</p>
+<div class="flex flex-wrap gap-3">
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800/50 dark:border dark:border-gray-700 pl-4 pr-3 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800">
+<p class="text-[#0d101c] dark:text-gray-200 text-sm font-medium leading-normal">Last 6 Months</p>
+<span class="material-symbols-outlined text-[#0d101c] dark:text-gray-400">expand_more</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800/50 dark:border dark:border-gray-700 pl-4 pr-3 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800">
+<p class="text-[#0d101c] dark:text-gray-200 text-sm font-medium leading-normal">All States</p>
+<span class="material-symbols-outlined text-[#0d101c] dark:text-gray-400">expand_more</span>
+</button>
+<button class="flex h-10 shrink-0 items-center justify-center gap-x-2 rounded-lg bg-white dark:bg-gray-800/50 dark:border dark:border-gray-700 pl-4 pr-3 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800">
+<p class="text-[#0d101c] dark:text-gray-200 text-sm font-medium leading-normal">All Districts</p>
+<span class="material-symbols-outlined text-[#0d101c] dark:text-gray-400">expand_more</span>
+</button>
+</div>
+</div>
+<div class="flex p-4">
+<div class="w-full h-[500px] bg-center bg-no-repeat bg-cover rounded-xl shadow-lg" data-alt="A satellite map of a forested region with various data points overlaid." data-location="India" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB_1KFw_O6JesL-CbCtMtLF-3cVykj_A8EyTqRg9v7Viei1tUOMomDUpcVha6Tdj5JgdI-boddGfafuUC7lciN3pVu5l2sSTvqKcZBKQMZqsnRpHRcBBykEiWF7yvGXM69ocjPZYPj6UaJTE4OWdXaL8GzymbE1If_K2zb07t-zMbGPk0TR_bUiIUa4uiQvqdm4HAnMabSp5U1KMhWiIGOBe24Si_WDqwmB3NzfCes1-B49JZLP2L4Usxtkf3EKgsse2X2btkZMZ68");'></div>
+</div>
+<h2 class="text-[#0d101c] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Transparency Metrics</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-4">
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col gap-2">
+<p class="text-sm text-gray-500 dark:text-gray-400">Total Claims Submitted</p>
+<p class="text-3xl font-bold text-[#0d101c] dark:text-white">1,245,678</p>
+<p class="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">+12.5% this month</p>
+</div>
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col gap-2">
+<p class="text-sm text-gray-500 dark:text-gray-400">Claims Approved</p>
+<p class="text-3xl font-bold text-[#0d101c] dark:text-white">896,211</p>
+<p class="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">+8.2% this month</p>
+</div>
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col gap-2">
+<p class="text-sm text-gray-500 dark:text-gray-400">Claims Rejected</p>
+<p class="text-3xl font-bold text-[#0d101c] dark:text-white">210,432</p>
+<p class="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">+2.1% this month</p>
+</div>
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm flex flex-col gap-2">
+<p class="text-sm text-gray-500 dark:text-gray-400">Avg. Processing Time</p>
+<p class="text-3xl font-bold text-[#0d101c] dark:text-white">85 Days</p>
+<p class="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">-5 days from last month</p>
+</div>
+</div>
+<h2 class="text-[#0d101c] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Impact Dashboard</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-4">
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm">
+<p class="font-bold text-[#0d101c] dark:text-white mb-4">Forest Land Titled (Hectares)</p>
+<div class="w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+<img class="object-cover w-full h-full rounded-lg" data-alt="A bar chart showing the amount of forest land titled over the past six months, with a clear upward trend." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPDxFBphVjMX3_xbeutBxz6c-jZ3AoL1A2qCQXaBjr_eS5EarDShTsGpvvJ2n_yV3j0DkqC8A0cu3_nb6zOPol11XvJK5nK-lgF1495c4f5aBEAWWX44YVA4hTbTv6gq5QagIxuSfnxtZFApmpo_nsiFgEm36awoU5aJ0-fNLc1CmKwtGKYybxzwMVkQJo2E9CA_XQQRRciRJrKVwHZ2qziKWL9eVTOOdZ25Jy2bGIF2iWsPGLdMuW-OSMBxGh4DM1qnMQI41iOeU"/>
+</div>
+</div>
+<div class="bg-white dark:bg-gray-800/50 rounded-xl p-6 shadow-sm">
+<p class="font-bold text-[#0d101c] dark:text-white mb-4">Families Benefited</p>
+<div class="w-full h-64 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+<img class="object-cover w-full h-full rounded-lg" data-alt="A line graph illustrating the cumulative number of families benefited over time, indicating steady growth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFoH870NfH3RjKTIUwzj6W8PgSZCyv2qT27TJryEdXVkr-bX8_3LrT6Q5YK64N9cF0kmpuR3e43u1UrrIBdi9mKSleaTbbzth6rMucZvEs96quleIH25y5WEq2NuGqalIBrGFqhYVdY4s-A05tjAgbcgDHiQd12Ug8WJi9KxBpmHtYi1vyjubKIyJ3eRDDKd7kv1g6yEtF0NSCdxY9pm5B_V257O_nDNn18GUv_iI4GsaFU9j8QQa1fwMkEx2XVMTR8Bc4wMmsiik"/>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+</body></html>
