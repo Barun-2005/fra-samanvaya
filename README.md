@@ -118,26 +118,10 @@ fra-samanvaya/
 
 This project was developed as part of Smart India Hackathon 2025. While it's currently maintained by the team, we welcome feedback and suggestions.
 
-## Team
-
-**SIH 2025 Team:**
-- Team Lead & Full-Stack Development
-- Additional team member contributions
-- (Add your team members' names and roles here)
-
-**Institution:** [Your College/University Name]  
 **Hackathon:** Smart India Hackathon 2025
 
 ## License
 
 MIT License - See LICENSE file for details.
-
-## Acknowledgments
-
-- Smart India Hackathon organizing committee
-- Google Gemini API team
-- Open source community
-
----
 
 **Contact:** For queries or support, please open an issue on GitHub.
