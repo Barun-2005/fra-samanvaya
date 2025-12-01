@@ -1,6 +1,6 @@
 # FRA Samanvay
 
-An AI-powered platform for managing Forest Rights Act (FRA) claims in India, developed as part of Smart India Hackathon 2024.
+An AI-powered platform for managing Forest Rights Act (FRA) claims in India, developed as part of Smart India Hackathon 2025.
 
 **Live Demo:** https://fra-samanvay.vercel.app
 
@@ -91,15 +91,6 @@ GEMINI_API_KEY=your_gemini_api_key
 NEXT_PUBLIC_API_URL=http://localhost:4000/api  # For local development
 ```
 
-## Testing
-
-Sample test credentials are available for different roles:
-- Super Admin: `barun` / `password123`
-- Citizen: `ramesh` / `password`
-- Verification Officer: `verifier` / `password`
-
-For complete testing instructions, see [BETA_TESTING_GUIDE.md](./BETA_TESTING_GUIDE.md)
-
 ## Project Structure
 
 ```
@@ -123,28 +114,19 @@ fra-samanvaya/
 └── README.md
 ```
 
-## Deployment
-
-The application is deployed using:
-- **Vercel** for the Next.js frontend
-- **Render** for the Node.js backend
-- **MongoDB Atlas** for the database
-
-For detailed deployment instructions, refer to [DEPLOYMENT.md](./DEPLOYMENT.md)
-
 ## Contributing
 
-This project was developed as part of Smart India Hackathon 2024. While it's currently maintained by the team, we welcome feedback and suggestions.
+This project was developed as part of Smart India Hackathon 2025. While it's currently maintained by the team, we welcome feedback and suggestions.
 
 ## Team
 
-**SIH 2024 Team:**
+**SIH 2025 Team:**
 - Team Lead & Full-Stack Development
 - Additional team member contributions
 - (Add your team members' names and roles here)
 
 **Institution:** [Your College/University Name]  
-**Hackathon:** Smart India Hackathon 2024
+**Hackathon:** Smart India Hackathon 2025
 
 ## License
 
