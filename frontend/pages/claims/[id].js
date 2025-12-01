@@ -161,8 +161,8 @@ const ClaimDetailPage = () => {
                     #{claim._id.slice(-6).toUpperCase()}
                   </span>
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${claim.status === 'Approved' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                      claim.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
-                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                    claim.status === 'Rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
                     }`}>
                     {claim.status}
                   </span>
@@ -280,8 +280,8 @@ const ClaimDetailPage = () => {
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`px-6 py-3 text-sm font-bold capitalize whitespace-nowrap border-b-2 transition-colors ${activeTab === tab
-                          ? 'border-primary text-primary'
-                          : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
                         }`}
                     >
                       {tab}
