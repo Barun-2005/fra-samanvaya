@@ -14,7 +14,7 @@ export default function TwoFactorAuthPage() {
     try {
       await api.post('/auth/verify-2fa', { token: otp });
       router.push('/dashboard');
-    } catch (err) => {
+    } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during 2FA verification.');
     }
   };
