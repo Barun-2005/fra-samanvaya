@@ -1,9 +1,13 @@
-// Hardcode Atlas URI since .env loading is failing
-process.env.MONGO_URI = 'mongodb+srv://barunpattanaik2_db_user:8gk4tGmpc8q2lr1h@cluster0.g19x5gu.mongodb.net/FraSamanvayaLocal?retryWrites=true&w=majority&appName=Cluster0';
-
 const mongoose = require('mongoose');
 const User = require('../src/models/User');
+const Claim = require('../src/models/Claim');
+const Document = require('../src/models/Document');
 const connectDB = require('../src/config/db');
+const path = require('path');
+const dotenv = require('dotenv');
+
+// Load env from root
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const users = [
   {
@@ -67,6 +71,18 @@ const users = [
     "avatarUrl": "/assets/avatars/avatar6.png"
   },
   {
+    "username": "barun",
+    "password": "password123",
+    "roles": ["Super Admin", "Citizen"],
+    "employeeId": "SA-001",
+    "fullName": "Barun Pattanaik",
+    "email": "barunpattanaik2@gmail.com",
+    "department": "Administration",
+    "state": "Odisha",
+    "district": "Khordha",
+    "avatarUrl": "/assets/avatars/avatar6.png"
+  },
+  {
     "username": "ramesh",
     "password": "password",
     "roles": ["Citizen"],
@@ -95,88 +111,110 @@ const users = [
 ];
 
 const seedDB = async () => {
-  await connectDB();
   try {
-    await User.deleteMany({});
-    console.log('Old users removed.');
+    const uri = process.env.MONGO_URI;
+    if (!uri) {
+      console.error('Error: MONGO_URI is not defined in .env');
+      process.exit(1);
+    }
+    await mongoose.connect(uri);
+    console.log('Connected to MongoDB');
 
+    await User.deleteMany({});
+    await Claim.deleteMany({});
+    await Document.deleteMany({});
+    console.log('Old data cleared.');
+
+    // Seed Users
+    const createdUsers = {};
     for (const userData of users) {
       const user = new User(userData);
       await user.save();
+      createdUsers[userData.username] = user;
     }
-
-    console.log(`Database seeded with ${users.length} new detailed users!`);
+    console.log(`Seeded ${users.length} users.`);
 
     // Seed Claims
-    const Claim = require('../src/models/Claim');
-    const Document = require('../src/models/Document');
+    const ramesh = createdUsers['ramesh'];
+    const sunita = createdUsers['sunita'];
+    const verifier = createdUsers['verifier'];
 
-    await Claim.deleteMany({});
-    await Document.deleteMany({});
-
-    const ramesh = await User.findOne({ username: 'ramesh' });
-
-    if (ramesh) {
-      // Create Claim first (needed for Document reference)
-      const claim = new Claim({
+    const claimsData = [
+      {
         claimant: ramesh._id,
+        claimantName: ramesh.fullName,
         aadhaarNumber: "123456789012",
         village: ramesh.village,
         district: ramesh.district,
         state: ramesh.state,
         landSizeClaimed: 2.5,
+        surveyNumber: "123/A",
         claimType: "Individual",
         status: "Submitted",
         reasonForClaim: "Ancestral land cultivation for 3 generations.",
         dateSubmitted: new Date(),
-        geojson: {
-          type: "Polygon",
-          coordinates: [[
-            [77.123, 28.456],
-            [77.124, 28.456],
-            [77.124, 28.457],
-            [77.123, 28.457],
-            [77.123, 28.456]
-          ]]
-        }
-      });
+        geojson: { type: "Polygon", coordinates: [[[77.1, 28.4], [77.2, 28.4], [77.2, 28.5], [77.1, 28.5], [77.1, 28.4]]] }
+      },
+      {
+        claimant: sunita._id,
+        claimantName: sunita.fullName,
+        aadhaarNumber: "987654321098",
+        village: sunita.village,
+        district: sunita.district,
+        state: sunita.state,
+        landSizeClaimed: 1.8,
+        claimType: "Community",
+        status: "Verified",
+        verifiedBy: verifier._id,
+        verifiedAt: new Date(),
+        verificationNotes: "Field visit confirmed boundaries.",
+        reasonForClaim: "Community forest resource rights.",
+        dateSubmitted: new Date(Date.now() - 86400000), // 1 day ago
+        geojson: { type: "Polygon", coordinates: [[[78.1, 29.4], [78.2, 29.4], [78.2, 29.5], [78.1, 29.5], [78.1, 29.4]]] }
+      },
+      {
+        claimant: ramesh._id,
+        claimantName: ramesh.fullName,
+        aadhaarNumber: "123456789012",
+        village: ramesh.village,
+        district: ramesh.district,
+        state: ramesh.state,
+        landSizeClaimed: 4.0,
+        claimType: "Individual",
+        status: "Approved",
+        verifiedBy: verifier._id,
+        verifiedAt: new Date(Date.now() - 172800000), // 2 days ago
+        approvedBy: createdUsers['approver']._id,
+        approvedAt: new Date(),
+        approvalNotes: "All documents in order. Title deed generated.",
+        reasonForClaim: "Old claim re-verified.",
+        dateSubmitted: new Date(Date.now() - 259200000), // 3 days ago
+        geojson: { type: "Polygon", coordinates: [[[77.3, 28.6], [77.4, 28.6], [77.4, 28.7], [77.3, 28.7], [77.3, 28.6]]] }
+      }
+    ];
 
+    for (const cData of claimsData) {
+      const claim = new Claim(cData);
       const savedClaim = await claim.save();
 
-      // Create Documents
-      const docs = [
-        {
-          claim: savedClaim._id,
-          uploader: ramesh._id,
-          type: "Aadhar",
-          fileRef: "uploads/sample_aadhar.jpg"
-        },
-        {
-          claim: savedClaim._id,
-          uploader: ramesh._id,
-          type: "Land Receipt",
-          fileRef: "uploads/sample_land.pdf"
-        }
-      ];
-
-      const savedDocs = [];
-      for (const docData of docs) {
-        const doc = new Document(docData);
-        const savedDoc = await doc.save();
-        savedDocs.push(savedDoc._id);
-      }
-
-      // Update Claim with Documents
-      savedClaim.documents = savedDocs;
+      // Add dummy documents
+      const doc = new Document({
+        claim: savedClaim._id,
+        uploader: cData.claimant,
+        type: "Aadhar",
+        fileRef: "uploads/sample_aadhar.jpg"
+      });
+      const savedDoc = await doc.save();
+      savedClaim.documents.push(savedDoc._id);
       await savedClaim.save();
-
-      console.log('Seeded sample claim with documents for Ramesh.');
     }
 
+    console.log(`Seeded ${claimsData.length} claims with documents.`);
+    process.exit(0);
+
   } catch (err) {
-    console.error('Error seeding database:', err.message);
-  } finally {
-    mongoose.connection.close();
+    console.error('Error seeding database:', err);
+    process.exit(1);
   }
 };
 

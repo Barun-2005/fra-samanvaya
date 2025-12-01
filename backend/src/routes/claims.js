@@ -51,6 +51,7 @@ router.post('/check-conflicts', requireAuth, async (req, res) => {
 
 router.get('/', requireAuth, claimController.getAllClaims);
 router.post('/', requireAuth, claimController.createClaim);
+router.get('/similar', requireAuth, claimController.findSimilarClaims);
 router.get('/:id', requireAuth, claimController.getClaimById);
 router.put('/:id', requireAuth, claimController.updateClaim);
 
@@ -58,6 +59,7 @@ router.put('/:id', requireAuth, claimController.updateClaim);
 router.post('/:id/verify', requireAuth, claimController.verifyClaim);
 router.post('/:id/approve', requireAuth, claimController.approveClaim);
 router.post('/:id/reject', requireAuth, claimController.rejectClaim);
+router.get('/:id/risk', requireAuth, claimController.getClaimRisk);
 
 module.exports = router;
 

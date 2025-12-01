@@ -10,6 +10,9 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 import AIAnalysisCard from '../../src/components/Claims/AIAnalysisCard';
 import ConflictWarning from '../../src/components/Claims/ConflictWarning';
+import SchemeRecommendationsWidget from '../../src/components/Dashboard/SchemeRecommendationsWidget';
+import LegalAssistant from '../../src/components/Assistant/LegalAssistant';
+import RiskAnalysisPanel from '../../src/components/Claims/RiskAnalysisPanel';
 
 const ClaimDetailPage = () => {
   const router = useRouter();
@@ -298,8 +301,20 @@ const ClaimDetailPage = () => {
 
               {/* AI Analysis Section - For Officers */}
               {!user?.roles.includes('Citizen') && (
-                <div className="md:col-span-2">
-                  <AIAnalysisCard claimId={claim._id} initialAnalysis={claim.assetSummary} />
+                <div className="md:col-span-2 space-y-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                      <AIAnalysisCard claimId={claim._id} initialAnalysis={claim.assetSummary} />
+                      <SchemeRecommendationsWidget claimId={claim._id} />
+                    </div>
+                    {/* Legal Assistant Sidebar for Verifiers/Approvers */}
+                    <div className="lg:col-span-1 space-y-6">
+                      <LegalAssistant currentClaim={claim} />
+                      {user?.roles.includes('Approving Authority') && (
+                        <RiskAnalysisPanel claimId={claim._id} />
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 

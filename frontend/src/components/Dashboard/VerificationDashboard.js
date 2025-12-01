@@ -2,12 +2,14 @@ import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import api from '../../lib/api';
+import FieldVisitMode from '../Claims/FieldVisitMode';
 
 export default function VerificationDashboard() {
     const { user } = useAuth();
     const [queue, setQueue] = useState([]);
     const [stats, setStats] = useState({ pending: 0, todayVerified: 0, totalVerified: 0 });
     const [loading, setLoading] = useState(true);
+    const [activeFieldVisitClaim, setActiveFieldVisitClaim] = useState(null);
 
     useEffect(() => {
         fetchQueue();
@@ -105,7 +107,13 @@ export default function VerificationDashboard() {
                                             <td className="py-3 px-4 text-muted-foreground text-sm">
                                                 {claim.dateSubmitted ? new Date(claim.dateSubmitted).toLocaleDateString() : 'Recent'}
                                             </td>
-                                            <td className="py-3 px-4 text-right">
+                                            <td className="py-3 px-4 text-right flex justify-end gap-2">
+                                                <button
+                                                    onClick={() => setActiveFieldVisitClaim(claim)}
+                                                    className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200 transition-colors text-sm"
+                                                >
+                                                    📱 Field Mode
+                                                </button>
                                                 <Link href={`/claims/${claim._id}`}>
                                                     <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
                                                         Review →
@@ -120,6 +128,14 @@ export default function VerificationDashboard() {
                     )}
                 </div>
             </div>
+
+            {activeFieldVisitClaim && (
+                <FieldVisitMode
+                    claim={activeFieldVisitClaim}
+                    onClose={() => setActiveFieldVisitClaim(null)}
+                    onUpdate={fetchQueue}
+                />
+            )}
         </div>
     );
 }

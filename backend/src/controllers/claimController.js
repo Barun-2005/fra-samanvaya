@@ -311,3 +311,54 @@ exports.rejectClaim = async (req, res) => {
     res.status(500).json({ message: 'Error rejecting claim', error: error.message });
   }
 };
+// Find similar approved claims (Precedents)
+exports.findSimilarClaims = async (req, res) => {
+  try {
+    const { village, district, claimType } = req.query;
+
+    if (!village && !district) {
+      return res.status(400).json({ message: 'Village or District is required' });
+    }
+
+    const query = {
+      status: 'Approved',
+      _id: { $ne: req.params.id } // Exclude current claim if ID is passed
+    };
+
+    if (village) query.village = { $regex: village, $options: 'i' };
+    if (district) query.district = { $regex: district, $options: 'i' };
+    if (claimType) query.claimType = claimType;
+
+    const similarClaims = await Claim.find(query)
+      .select('claimantName village landSizeClaimed approvedAt claimType')
+      .sort({ approvedAt: -1 })
+      .limit(5);
+
+    res.json(similarClaims);
+  } catch (error) {
+    console.error('Find similar claims error:', error);
+    res.status(500).json({ message: 'Error finding similar claims' });
+  }
+};
+// Get Risk Analysis & Draft Patta
+exports.getClaimRisk = async (req, res) => {
+  try {
+    const { analyzeRisk, generatePatta } = require('../services/riskEngine');
+    const claim = await Claim.findById(req.params.id);
+
+    if (!claim) return res.status(404).json({ message: 'Claim not found' });
+
+    const riskAnalysis = await analyzeRisk(claim);
+
+    // Only generate Patta if approved or verified (to save tokens)
+    let draftPatta = null;
+    if (['Verified', 'Approved'].includes(claim.status)) {
+      draftPatta = await generatePatta(claim);
+    }
+
+    res.json({ riskAnalysis, draftPatta });
+  } catch (error) {
+    console.error('Risk analysis error:', error);
+    res.status(500).json({ message: 'Error analyzing risk' });
+  }
+};

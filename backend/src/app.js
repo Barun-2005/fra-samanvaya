@@ -21,11 +21,24 @@ app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/users', require('./routes/users'));
-app.use('/api/claims', require('./routes/claims'));
-app.use('/api/documents', require('./routes/documents'));
-// app.use('/api/assets', require('./routes/assets'));
-// app.use('/api/schemes', require('./routes/schemes'));
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
+const claimRoutes = require('./routes/claims');
+const documentRoutes = require('./routes/documents');
+const assetRoutes = require('./routes/assets');
+const schemeRoutes = require('./routes/schemes');
+const atlasRoutes = require('./routes/atlas');
+const knowledgeBaseRoutes = require('./routes/knowledgeBase');
+const adminRoutes = require('./routes/admin');
+
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/claims', claimRoutes);
+app.use('/api/documents', documentRoutes);
+app.use('/api/assets', assetRoutes);
+app.use('/api/schemes', schemeRoutes);
+app.use('/api/atlas', atlasRoutes);
+app.use('/api/knowledge-base', knowledgeBaseRoutes);
+app.use('/api/admin', adminRoutes);
 
 module.exports = app;

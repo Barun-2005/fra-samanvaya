@@ -32,6 +32,7 @@ const userSchema = new mongoose.Schema({
   // Existing fields
   state: { type: String },
   district: { type: String },
+  village: { type: String },
   totpSecret: { type: String },
   maskedAadhaar: { type: String },
   createdAt: { type: Date, default: Date.now },

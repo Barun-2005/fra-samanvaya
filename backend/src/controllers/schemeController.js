@@ -17,10 +17,12 @@ exports.getRecommendations = async (req, res) => {
             return res.status(404).json({ message: 'Claim not found' });
         }
 
-        // Get claimant data from first document's extraction
-        const claimantData = claim.documents[0]?.extractedData || {
-            claimantName: 'Unknown',
-            landSizeClaimed: 0
+        // Get claimant data from claim details (primary) or document extraction (fallback)
+        const claimantData = {
+            claimantName: claim.claimantName || claim.documents?.[0]?.extractedData?.claimantName || 'Unknown',
+            landSizeClaimed: claim.landSizeClaimed || claim.documents?.[0]?.extractedData?.landSizeClaimed || 0,
+            village: claim.village || claim.documents?.[0]?.extractedData?.village || 'Unknown',
+            claimType: claim.claimType || 'Individual'
         };
 
         // Get asset analysis data
@@ -34,7 +36,7 @@ exports.getRecommendations = async (req, res) => {
         // Get recommendations from Gemini DSS
         const recommendations = await recommendSchemes(claimantData, assetData);
 
-        res.status(200).json(recommendations);
+        res.status(200).json(recommendations.schemes);
 
     } catch (error) {
         console.error('Scheme recommendation error:', error);
@@ -48,22 +50,56 @@ exports.getRecommendations = async (req, res) => {
 /**
  * Get all available schemes (static list)
  */
-eligibility: 'Forest dwelling scheduled tribes and traditional forest dwellers',
-    benefit: 'Land title deed'
+exports.getAllSchemes = (req, res) => {
+    const schemes = [
+        {
+            name: 'Forest Rights Act',
+            description: 'Recognition of forest rights',
+            eligibility: 'Forest dwelling scheduled tribes and traditional forest dwellers',
+            benefit: 'Land title deed'
         },
-{
-    name: 'MGNREGA',
-        description: 'Mahatma Gandhi National Rural Employment Guarantee Act',
+        {
+            name: 'MGNREGA',
+            description: 'Mahatma Gandhi National Rural Employment Guarantee Act',
             eligibility: 'Rural households',
-                benefit: '100 days of wage employment'
-},
-{
-    name: 'Kisan Credit Card',
-        description: 'Agricultural credit for farmers',
+            benefit: '100 days of wage employment'
+        },
+        {
+            name: 'Kisan Credit Card',
+            description: 'Agricultural credit for farmers',
             eligibility: 'Farmers with landholding',
-                benefit: 'Low-interest agricultural credit'
-}
+            benefit: 'Low-interest agricultural credit'
+        }
     ];
 
-res.status(200).json({ schemes });
+    res.status(200).json({ schemes });
+};
+
+exports.createScheme = async (req, res) => {
+    try {
+        // Mock creation for now
+        res.status(201).json({ message: 'Scheme created' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error creating scheme' });
+    }
+};
+
+// AI Policy Matcher for Scheme Admins
+exports.matchSchemesForVillage = async (req, res) => {
+    try {
+        const { matchSchemes } = require('../services/policyMatcher');
+        const { village, district, approvedClaims, totalLand } = req.body;
+
+        const recommendations = await matchSchemes({
+            name: village,
+            district,
+            approvedClaims,
+            totalLand
+        });
+
+        res.json(recommendations);
+    } catch (error) {
+        console.error('Policy matching error:', error);
+        res.status(500).json({ message: 'Error matching schemes' });
+    }
 };

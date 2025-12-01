@@ -7,7 +7,10 @@ import VerificationDashboard from '../src/components/Dashboard/VerificationDashb
 import ApprovalDashboard from '../src/components/Dashboard/ApprovalDashboard';
 import SchemeAdminDashboard from '../src/components/Dashboard/SchemeAdminDashboard';
 import NGOViewerDashboard from '../src/components/Dashboard/NGOViewerDashboard';
+import SuperAdminDashboard from '../src/components/Dashboard/SuperAdminDashboard';
 import AuthGuard from '../src/components/Layout/AuthGuard';
+
+import DashboardLayout from '../src/components/Layout/DashboardLayout';
 
 const Dashboard = () => {
     const { user, loading } = useAuth();
@@ -37,8 +40,12 @@ const Dashboard = () => {
             return <VerificationDashboard />;
         }
 
-        if (user.roles.includes('Approving Authority') || user.roles.includes('Super Admin')) {
+        if (user.roles.includes('Approving Authority')) {
             return <ApprovalDashboard />;
+        }
+
+        if (user.roles.includes('Super Admin')) {
+            return <SuperAdminDashboard />;
         }
 
         if (user.roles.includes('Scheme Admin')) {
@@ -60,7 +67,9 @@ const Dashboard = () => {
 
     return (
         <AuthGuard>
-            {renderDashboard()}
+            <DashboardLayout>
+                {renderDashboard()}
+            </DashboardLayout>
         </AuthGuard>
     );
 };

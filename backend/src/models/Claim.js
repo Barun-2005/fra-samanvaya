@@ -3,7 +3,19 @@ const mongoose = require('mongoose');
 const claimSchema = new mongoose.Schema({
   claimant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   scheme: { type: mongoose.Schema.Types.ObjectId, ref: 'Scheme', required: false },
-  status: { type: String, enum: ['Draft', 'Submitted', 'InVerification', 'Verified', 'Approved', 'Rejected'], default: 'Draft' },
+  status: { type: String, enum: ['Draft', 'Submitted', 'InVerification', 'Verified', 'Approved', 'Rejected', 'ConflictDetected'], default: 'Draft' },
+
+  // Core Claim Details
+  claimantName: { type: String },
+  aadhaarNumber: { type: String },
+  village: { type: String },
+  district: { type: String },
+  state: { type: String },
+  landSizeClaimed: { type: Number },
+  surveyNumber: { type: String },
+  claimType: { type: String, enum: ['Individual', 'Community'], default: 'Individual' },
+  reasonForClaim: { type: String },
+  boundaryArea: { type: Number }, // Calculated area from GeoJSON
   geojson: {
     type: {
       type: String,
