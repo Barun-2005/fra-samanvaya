@@ -1,156 +1,161 @@
-# 🌲 FRA Samanvay
+# FRA Samanvay
 
-**AI-Powered Forest Rights Management Platform**
+An AI-powered platform for managing Forest Rights Act (FRA) claims in India, developed as part of Smart India Hackathon 2024.
 
-A next-generation government platform for managing Forest Rights Act (FRA) claims in India, featuring advanced AI integration, geospatial analysis, and role-based workflows.
+**Live Demo:** https://fra-samanvay.vercel.app
 
-🔗 **Live Demo:** https://fra-samanvay.vercel.app
+## Overview
 
----
+FRA Samanvay streamlines the forest rights claim process by integrating AI-powered document processing, geospatial analysis, and role-based workflows. The platform serves citizens, government officials, and NGOs involved in the FRA claim lifecycle.
 
-## 🎯 Key Features
+## Key Features
 
-### 🤖 AI & Intelligence
-- **Gemini 2.5 Pro OCR** - Automated document extraction (Aadhaar, land records)
-- **Veracity Scoring** - AI analyzes land claims for authenticity (0-100 score)
-- **FraBot RAG Assistant** - Intelligent chatbot with policy knowledge
-- **Conflict Detection** - Automatic detection of overlapping land claims
-- **Anomaly Detection** - Identifies suspicious approval patterns
+### AI Integration
+- **Automated OCR**: Document extraction using Google Gemini 2.5 Pro (Aadhaar, land records, etc.)
+- **Veracity Analysis**: AI-powered authenticity scoring for land claims
+- **Conflict Detection**: Automatic identification of overlapping land boundaries
+- **FraBot Assistant**: RAG-powered chatbot for policy guidance and support
+- **Anomaly Detection**: Pattern recognition for suspicious approval behaviors
 
-### 🗺️ GIS & Mapping
-- **Interactive GIS Atlas** - Regional analysis with drawing tools
-- **Real-time Conflict Visualization** - See overlapping boundaries instantly
-- **Leaflet Integration** - Professional map rendering with area calculations
+### Geospatial Tools
+- **Interactive GIS Atlas**: Regional analysis with drawing and measurement tools
+- **Real-time Visualization**: Instant conflict detection on map interface
+- **Area Calculations**: Automated land measurement with Leaflet integration
 
-### 👥 8+ User Roles
-1. **Citizen** - Submit & track claims
-2. **Data Entry Officer** - Create claims for citizens
-3. **Verification Officer** - Field visits, AI-powered verification
-4. **Approving Authority** - Final claim approval
-5. **District Collector** - District-level oversight
-6. **SDLC** - Sub-divisional authority
-7. **Scheme Admin** - Policy matching & recommendations
-8. **NGO Viewer** - Transparency & watchdog access
-9. **Super Admin** - System management
+### Role-Based Access
+The platform supports 8+ distinct user roles with customized dashboards:
+- Citizens (claim submission and tracking)
+- Data Entry Officers (assisted claim creation)
+- Verification Officers (field verification with AI support)
+- Approving Authorities (final claim decisions)
+- District Collectors & SDLC (administrative oversight)
+- Scheme Admins (policy matching and recommendations)
+- NGO Viewers (transparency and monitoring)
+- Super Admins (system management)
 
-### 📊 Smart Dashboards
-- Role-specific views for each user type
-- Real-time statistics & analytics
-- Customized action buttons based on permissions
+## Technology Stack
 
-### 🛡️ Security & Compliance
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Audit trail for all actions
-- MongoDB Atlas (cloud database)
+**Frontend:** Next.js 15, React 19, TailwindCSS  
+**Backend:** Node.js, Express, MongoDB Atlas  
+**AI/ML:** Google Gemini 2.5 Pro API  
+**Maps:** Leaflet, React-Leaflet  
+**Deployment:** Vercel (Frontend), Render (Backend)
 
----
-
-## 🚀 Tech Stack
-
-**Frontend:** Next.js 15 + React 19 + TailwindCSS  
-**Backend:** Node.js + Express + MongoDB  
-**AI:** Google Gemini 2.5 Pro API  
-**Maps:** Leaflet + React-Leaflet  
-**Hosting:** Vercel (Frontend) + Render (Backend)
-
----
-
-## 🧪 Beta Testing
-
-**Test the app:** https://fra-samanvay.vercel.app
-
-### Sample Credentials
-| Role | Username | Password |
-|:-----|:---------|:---------|
-| Super Admin | `barun` | `password123` |
-| Citizen | `ramesh` | `password` |
-| Verification Officer | `verifier` | `password` |
-
-[📖 Full Testing Guide](./BETA_TESTING_GUIDE.md)
-
----
-
-## 💻 Local Development
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- MongoDB (local or Atlas)
-- Google Gemini API Key
+- Node.js 18 or higher
+- MongoDB (local instance or Atlas account)
+- Google Gemini API key
 
-### Setup
+### Local Development
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
    git clone https://github.com/Barun-2005/fra-samanvay.git
    cd fra-samanvay
    ```
 
-2. **Backend Setup:**
+2. Set up the backend:
    ```bash
    cd backend
    npm install
-   cp .env.example .env  # Fill in your MongoDB URI & API keys
-   npm run seed          # Seed the database
-   npm run dev           # Start on port 4000
+   cp .env.example .env  # Configure your environment variables
+   npm run seed          # Initialize database with sample data
+   npm run dev           # Start backend server (port 4000)
    ```
 
-3. **Frontend Setup:**
+3. Set up the frontend:
    ```bash
    cd frontend
    npm install
-   npm run dev           # Start on port 3001
+   npm run dev           # Start development server (port 3001)
    ```
 
-4. **Access locally:**
+4. Access the application:
    - Frontend: http://localhost:3001
    - Backend API: http://localhost:4000/api
 
----
+### Environment Variables
 
-## 📁 Project Structure
+**Backend (.env):**
+```
+MONGO_URI=your_mongodb_connection_string
+JWT_ACCESS_SECRET=your_access_secret
+JWT_REFRESH_SECRET=your_refresh_secret
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+**Frontend:**
+```
+NEXT_PUBLIC_API_URL=http://localhost:4000/api  # For local development
+```
+
+## Testing
+
+Sample test credentials are available for different roles:
+- Super Admin: `barun` / `password123`
+- Citizen: `ramesh` / `password`
+- Verification Officer: `verifier` / `password`
+
+For complete testing instructions, see [BETA_TESTING_GUIDE.md](./BETA_TESTING_GUIDE.md)
+
+## Project Structure
 
 ```
 fra-samanvaya/
 ├── backend/
 │   ├── src/
-│   │   ├── controllers/   # API logic
-│   │   ├── models/        # MongoDB schemas
-│   │   ├── services/      # AI & business logic
-│   │   └── middlewares/   # Auth, validation
-│   └── scripts/seed.js    # Database seeding
+│   │   ├── controllers/      # API endpoint handlers
+│   │   ├── models/           # MongoDB schemas
+│   │   ├── services/         # Business logic & AI integration
+│   │   ├── middlewares/      # Authentication & validation
+│   │   └── routes/           # API routes
+│   └── scripts/
+│       └── seed.js           # Database initialization
 ├── frontend/
-│   ├── pages/             # Next.js routes
+│   ├── pages/                # Next.js routes
 │   ├── src/
-│   │   ├── components/    # Reusable UI
-│   │   └── lib/           # API client
-│   └── public/            # Static assets
+│   │   ├── components/       # React components
+│   │   ├── lib/              # Utilities & API client
+│   │   └── context/          # React context providers
+│   └── public/               # Static assets
 └── README.md
 ```
 
+## Deployment
+
+The application is deployed using:
+- **Vercel** for the Next.js frontend
+- **Render** for the Node.js backend
+- **MongoDB Atlas** for the database
+
+For detailed deployment instructions, refer to [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+## Contributing
+
+This project was developed as part of Smart India Hackathon 2024. While it's currently maintained by the team, we welcome feedback and suggestions.
+
+## Team
+
+**SIH 2024 Team:**
+- Team Lead & Full-Stack Development
+- Additional team member contributions
+- (Add your team members' names and roles here)
+
+**Institution:** [Your College/University Name]  
+**Hackathon:** Smart India Hackathon 2024
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Acknowledgments
+
+- Smart India Hackathon organizing committee
+- Google Gemini API team
+- Open source community
+
 ---
 
-## 🌟 Highlights
-
-✅ **Production-Ready** - Deployed on Vercel + Render  
-✅ **AI-First** - Gemini 2.5 Pro integration throughout  
-✅ **Gov-Tech Design** - Professional, accessible UI  
-✅ **Scalable** - MongoDB Atlas + cloud hosting  
-✅ **Open Source** - MIT License
-
----
-
-## 📝 License
-
-MIT License - See [LICENSE](./LICENSE) for details.
-
----
-
-## 👨‍💻 Author
-
-**Barun Pattanaik**  
-GitHub: [@Barun-2005](https://github.com/Barun-2005)
-
----
-
-**Built with ❤️ for rural India**
+**Contact:** For queries or support, please open an issue on GitHub.
