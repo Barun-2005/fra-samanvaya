@@ -88,10 +88,86 @@ export default function Sidebar() {
                 <div className="flex flex-col gap-4">
                     {/* User Profile */}
                     <div className="flex items-center gap-3">
-                        <div
-                            className="bg-primary bg-center bg-no-repeat bg-cover rounded-full size-10 flex items-center justify-center text-white font-bold"
-                        >
-                            {user?.fullName?.charAt(0) || 'U'}
+                        <div className="relative group cursor-pointer">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                id="avatar-upload"
+                                onChange={async (e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+
+                                    // Helper to compress image
+                                    const compressImage = (file) => {
+                                        return new Promise((resolve) => {
+                                            const reader = new FileReader();
+                                            reader.readAsDataURL(file);
+                                            reader.onload = (event) => {
+                                                const img = new Image();
+                                                img.src = event.target.result;
+                                                img.onload = () => {
+                                                    const canvas = document.createElement('canvas');
+                                                    const MAX_WIDTH = 800;
+                                                    const MAX_HEIGHT = 800;
+                                                    let width = img.width;
+                                                    let height = img.height;
+
+                                                    if (width > height) {
+                                                        if (width > MAX_WIDTH) {
+                                                            height *= MAX_WIDTH / width;
+                                                            width = MAX_WIDTH;
+                                                        }
+                                                    } else {
+                                                        if (height > MAX_HEIGHT) {
+                                                            width *= MAX_HEIGHT / height;
+                                                            height = MAX_HEIGHT;
+                                                        }
+                                                    }
+
+                                                    canvas.width = width;
+                                                    canvas.height = height;
+                                                    const ctx = canvas.getContext('2d');
+                                                    ctx.drawImage(img, 0, 0, width, height);
+                                                    // Compress to JPEG at 0.7 quality
+                                                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                                                };
+                                            };
+                                        });
+                                    };
+
+                                    try {
+                                        const compressedBase64 = await compressImage(file);
+
+                                        // Call API to update avatar
+                                        const api = require('../../lib/api').default;
+                                        await api.put('/users/me/avatar', { avatarUrl: compressedBase64 });
+                                        // Reload user to update context
+                                        window.location.reload();
+                                    } catch (err) {
+                                        console.error('Failed to upload avatar', err);
+                                        alert('Failed to upload avatar');
+                                    }
+                                }}
+                            />
+                            <label htmlFor="avatar-upload" className="cursor-pointer">
+                                {user?.avatarUrl ? (
+                                    <img
+                                        src={user.avatarUrl}
+                                        alt="Profile"
+                                        className="w-10 h-10 rounded-full object-cover border-2 border-primary/20"
+                                    />
+                                ) : (
+                                    <div
+                                        className="bg-primary bg-center bg-no-repeat bg-cover rounded-full size-10 flex items-center justify-center text-white font-bold"
+                                    >
+                                        {user?.fullName?.charAt(0) || 'U'}
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <span className="text-white text-[10px] font-bold">EDIT</span>
+                                </div>
+                            </label>
                         </div>
                         <div className="flex flex-col">
                             <h1 className="text-[#0c101d] dark:text-white text-base font-medium leading-normal truncate">

@@ -75,3 +75,31 @@ exports.updateUserStatus = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+exports.updateAvatar = async (req, res) => {
+  try {
+    const { avatarUrl } = req.body;
+
+    // Basic validation for Base64 string (optional but good practice)
+    if (!avatarUrl || !avatarUrl.startsWith('data:image')) {
+      return res.status(400).json({ message: 'Invalid image format' });
+    }
+
+    // Check size (approximate from base64 length)
+    // Base64 is ~1.33x larger than binary. 500KB binary ~= 666KB base64.
+    if (avatarUrl.length > 700000) {
+      return res.status(400).json({ message: 'Image too large (max 500KB)' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { avatarUrl },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (error) {
+    console.error('Avatar update error:', error);
+    res.status(500).json({ message: 'Server error updating avatar' });
+  }
+};
