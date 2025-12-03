@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../lib/api';
 import { MessageSquare, Send, X, Scale, FileText, Shield, Briefcase, Eye, Bot } from 'lucide-react';
@@ -6,6 +7,7 @@ import toast from 'react-hot-toast';
 
 export default function FraBot() {
     const { user } = useAuth();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -50,11 +52,11 @@ export default function FraBot() {
             subtitle: 'Anomaly Detection & System Health'
         };
         return {
-            greeting: 'Namaste! I am FraBot. Ask me anything about the Forest Rights Act or your claim.',
-            context: 'You are a helpful assistant explaining the Forest Rights Act 2006 to a tribal citizen. Keep answers simple, encouraging, and clear.',
+            greeting: 'Namaste. I am the FRA Samanvay Assistant. I can help you understand the Forest Rights Act, check eligibility, or guide you through the claim process.',
+            context: 'You are a helpful government assistant explaining the Forest Rights Act 2006 to a citizen. Keep answers simple, respectful, and clear. Do not use emojis.',
             title: 'FRA Assistant',
             Icon: Bot,
-            subtitle: 'Your FRA Rights Guide'
+            subtitle: 'Forest Rights Act Guide'
         };
     };
 
@@ -86,15 +88,35 @@ export default function FraBot() {
         setLoading(true);
 
         try {
-            const response = await api.post('/knowledge-base/query', {
-                query: input,
-                roleContext: persona.context
+            // Map User Role to Agent Role
+            // Map User Role to Agent Role
+            let agentRole = 'citizen'; // Default to Mitra
+
+            if (user?.roles.includes('Data Entry Operator') || user?.roles.includes('data_entry')) {
+                agentRole = 'data_entry';
+            } else if (user?.roles.includes('NGO Member') || user?.roles.includes('ngo')) {
+                agentRole = 'ngo';
+            } else if (user?.roles.some(r => ['Verification Officer', 'Approving Authority', 'Scheme Admin', 'Super Admin'].includes(r))) {
+                agentRole = 'official'; // Vidhi
+            } else if (user?.roles.includes('Field Officer')) {
+                agentRole = 'field_officer'; // Satark
+            }
+
+            // Use user ID as session ID if logged in, otherwise use a persistent random ID for this session
+            // Append role to session ID to prevent history contamination between roles
+            const baseSessionId = user?.id || 'guest-' + new Date().toISOString().split('T')[0];
+            const sessionId = `${baseSessionId}-${agentRole}`;
+
+            const response = await api.post('/chat', {
+                message: input,
+                role: agentRole,
+                sessionId: sessionId
             });
 
             const botMessage = {
                 role: 'assistant',
-                text: response.data.answer,
-                sources: response.data.sources
+                text: response.data.response,
+                // sources: response.data.sources // LangChain might not return sources in the same way yet
             };
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
@@ -116,11 +138,15 @@ export default function FraBot() {
         }
     };
 
+    // Hide on login/register pages - MOVED HERE TO AVOID HOOK ERROR
+    const hiddenRoutes = ['/login', '/register', '/signup', '/'];
+    if (hiddenRoutes.includes(router.pathname)) return null;
+
     return (
         <>
             {/* Chat Window */}
             {isOpen && (
-                <div className="fixed bottom-8 right-8 w-96 z-50">
+                <div className="fixed bottom-8 right-8 w-96 z-[9999]">
                     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl flex flex-col h-[500px] border border-slate-200 dark:border-slate-700">
                         {/* Header - PROFESSIONAL WITH LUCIDE ICON */}
                         <header className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">

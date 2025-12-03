@@ -15,7 +15,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-export default function AtlasMap() {
+export default function AtlasMap({ onAnalysisComplete }) {
     const [analysis, setAnalysis] = useState(null);
     const [loading, setLoading] = useState(false);
     const mapRef = useRef();
@@ -30,6 +30,9 @@ export default function AtlasMap() {
         try {
             const response = await api.post('/atlas/analyze-region', { geojson });
             setAnalysis(response.data);
+            if (onAnalysisComplete) {
+                onAnalysisComplete(response.data);
+            }
             toast.success('Analysis complete!', { id: toastId });
         } catch (error) {
             console.error('Analysis failed:', error);

@@ -14,7 +14,20 @@ const app = express();
 app.use(cookieParser());
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: function (origin, callback) {
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://localhost:3001',
+            process.env.FRONTEND_URL,
+            'https://fra-samanvaya.vercel.app' // Fallback for Vercel
+        ].filter(Boolean);
+
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
@@ -40,5 +53,6 @@ app.use('/api/schemes', schemeRoutes);
 app.use('/api/atlas', atlasRoutes);
 app.use('/api/knowledge-base', knowledgeBaseRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', require('./routes/chat'));
 
 module.exports = app;

@@ -16,8 +16,11 @@ import {
     AlertCircle,
     ChevronLeft,
     ChevronRight,
-    MoreHorizontal
+    MoreHorizontal,
+    Bot,
+    X
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function DataEntryDashboard() {
     const { user } = useAuth();
@@ -59,12 +62,78 @@ export default function DataEntryDashboard() {
         claim.village?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [extractedData, setExtractedData] = useState(null);
+
     return (
         <RoleGuard allowedRoles={['Data Entry Operator', 'Data Entry Officer', 'Secretary', 'Gram Sabha']}>
             <DashboardLayout>
                 <Head>
                     <title>Data Entry Dashboard | FRA Samanvay</title>
                 </Head>
+
+                {/* Review Modal */}
+                {showReviewModal && extractedData && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-200 dark:border-slate-800">
+                            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Bot className="w-6 h-6 text-purple-600" />
+                                    Mitra Auto-Fill Review
+                                </h3>
+                                <button onClick={() => setShowReviewModal(false)} className="text-slate-500 hover:text-slate-700">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                            <div className="p-6 space-y-4">
+                                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-100 dark:border-purple-800">
+                                    <p className="text-sm text-purple-800 dark:text-purple-300 font-medium">
+                                        Confidence Score: {extractedData.confidence || 'High'}
+                                    </p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-500 uppercase mb-1">Claimant Name</label>
+                                        <input
+                                            type="text"
+                                            defaultValue={extractedData.extractedData?.claimantName}
+                                            className="w-full p-2 border rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-slate-500 uppercase mb-1">Village</label>
+                                        <input
+                                            type="text"
+                                            defaultValue={extractedData.extractedData?.village}
+                                            className="w-full p-2 border rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-xs font-medium text-slate-500 uppercase mb-1">Claim Type</label>
+                                        <input
+                                            type="text"
+                                            defaultValue={extractedData.extractedData?.claimType || 'Individual Forest Rights'}
+                                            className="w-full p-2 border rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-800/50">
+                                <button
+                                    onClick={() => setShowReviewModal(false)}
+                                    className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <Link href={`/create-claim?data=${encodeURIComponent(JSON.stringify(extractedData.extractedData))}`}>
+                                    <button className="px-4 py-2 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors shadow-lg shadow-purple-200">
+                                        Confirm & Create Claim
+                                    </button>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="p-4 lg:p-8 min-h-screen">
                     <div className="max-w-[1600px] mx-auto flex flex-col gap-8">
@@ -121,6 +190,45 @@ export default function DataEntryDashboard() {
                                                 Create New Claim
                                             </button>
                                         </Link>
+
+                                        {/* MITRA AUTO-FILL BUTTON */}
+                                        <div className="relative">
+                                            <input
+                                                type="file"
+                                                id="mitra-upload"
+                                                className="hidden"
+                                                accept="image/*,.pdf"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files[0];
+                                                    if (!file) return;
+
+                                                    const toastId = toast.loading('Mitra is reading the document...');
+                                                    try {
+                                                        const formData = new FormData();
+                                                        formData.append('document', file);
+                                                        formData.append('type', 'Claim Form');
+
+                                                        // Call Document Processor
+                                                        const res = await api.post('/documents/upload', formData);
+                                                        const data = res.data.extractionResult;
+
+                                                        // Show Review Modal instead of alert
+                                                        setExtractedData(data);
+                                                        setShowReviewModal(true);
+                                                        toast.success('Document Processed!', { id: toastId });
+
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        toast.error('Mitra could not read the file', { id: toastId });
+                                                    }
+                                                }}
+                                            />
+                                            <label htmlFor="mitra-upload" className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition-colors cursor-pointer shadow-lg shadow-purple-200">
+                                                <Bot className="w-5 h-5" />
+                                                Auto-Fill with Mitra
+                                            </label>
+                                        </div>
+
                                         <button className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary/10 text-primary rounded-lg font-bold hover:bg-primary/20 transition-colors">
                                             <Upload className="w-5 h-5" />
                                             Upload Bulk CSV

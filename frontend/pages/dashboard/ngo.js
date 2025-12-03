@@ -15,8 +15,12 @@ import {
     Download,
     ChevronDown,
     Search,
-    CheckCircle
+    CheckCircle,
+    FileText,
+    X,
+    AlertCircle
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Dynamic import for AtlasMap (avoid SSR issues)
 const AtlasMap = dynamic(() => import('../../src/components/Atlas/AtlasMap'), {
@@ -69,12 +73,114 @@ export default function NGODashboard() {
         }
     };
 
+    const [showReportModal, setShowReportModal] = useState(false);
+    const [regionAnalysis, setRegionAnalysis] = useState(null);
+
     return (
         <RoleGuard allowedRoles={['NGO Member', 'Public Viewer', 'NGO Viewer']}>
             <DashboardLayout>
                 <Head>
                     <title>NGO Viewer Dashboard | FRA Samanvay</title>
                 </Head>
+
+                {/* Report Modal */}
+                {showReportModal && (
+                    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                            <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <FileText className="w-6 h-6 text-primary" />
+                                    {regionAnalysis ? 'Regional Impact Assessment' : 'General Impact Report'}
+                                </h3>
+                                <button onClick={() => setShowReportModal(false)} className="text-slate-500 hover:text-slate-700">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
+                            <div className="p-8 space-y-6">
+                                <div className="flex justify-between items-end border-b border-slate-100 pb-4">
+                                    <div>
+                                        <p className="text-sm text-slate-500 uppercase tracking-wide">Report Region</p>
+                                        <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+                                            {regionAnalysis ? 'Selected Region' : 'Odisha State'}
+                                        </h2>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-slate-500">Generated On</p>
+                                        <p className="font-medium">{new Date().toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-primary">
+                                            {regionAnalysis ? regionAnalysis.transparencyScore : '1,240'}
+                                        </p>
+                                        <p className="text-xs text-slate-500 uppercase">
+                                            {regionAnalysis ? 'Transparency Score' : 'Claims Processed'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-green-600">
+                                            {regionAnalysis ? `${regionAnalysis.landCover.forestPercentage}%` : '68%'}
+                                        </p>
+                                        <p className="text-xs text-green-600 uppercase">
+                                            {regionAnalysis ? 'Forest Cover' : 'Approval Rate'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg text-center">
+                                        <p className="text-2xl font-bold text-blue-600">
+                                            {regionAnalysis ? `${regionAnalysis.landCover.waterPercentage}%` : '450 ha'}
+                                        </p>
+                                        <p className="text-xs text-blue-600 uppercase">
+                                            {regionAnalysis ? 'Water Bodies' : 'Land Titled'}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">Key Insights</h4>
+                                    <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                                        {regionAnalysis ? (
+                                            <>
+                                                <li className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                                                    {regionAnalysis.analysis.split('.')[0]}.
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                                                    Recommended Scheme: {regionAnalysis.schemes[0]?.name}.
+                                                </li>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <li className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                                                    Approval rate in tribal districts has improved by 15% this quarter.
+                                                </li>
+                                                <li className="flex items-start gap-2">
+                                                    <CheckCircle className="w-4 h-4 text-green-500 mt-0.5" />
+                                                    Average processing time reduced from 90 days to 85 days.
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="p-6 border-t border-slate-200 dark:border-slate-800 flex gap-3 justify-end bg-slate-50 dark:bg-slate-800/50">
+                                <button
+                                    onClick={() => setShowReportModal(false)}
+                                    className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-lg transition-colors"
+                                >
+                                    Close
+                                </button>
+                                <button className="px-4 py-2 bg-primary text-white font-bold rounded-lg hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
+                                    <Download className="w-4 h-4" />
+                                    Download PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="p-4 lg:p-8 min-h-screen">
                     <div className="max-w-[1600px] mx-auto flex flex-col gap-8">
@@ -93,9 +199,21 @@ export default function NGODashboard() {
                                 <button className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                     Last 6 Months <ChevronDown className="w-4 h-4" />
                                 </button>
-                                <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20">
-                                    <Download className="w-5 h-5" />
-                                    Export Data
+                                <button
+                                    onClick={() => {
+                                        if (!regionAnalysis) {
+                                            toast('Please select a region on the map first for a detailed report.', { icon: '🗺️' });
+                                        }
+                                        const toastId = toast.loading('Generating Impact Report...');
+                                        setTimeout(() => {
+                                            toast.success('Report Generated!', { id: toastId });
+                                            setShowReportModal(true);
+                                        }, 1500);
+                                    }}
+                                    className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                                >
+                                    <FileText className="w-5 h-5" />
+                                    {regionAnalysis ? 'Generate Regional Report' : 'Generate General Report'}
                                 </button>
                             </div>
                         </div>
@@ -109,7 +227,7 @@ export default function NGODashboard() {
                             <p className="text-slate-500 dark:text-slate-400 mb-4">
                                 Draw a region to analyze claim distribution, forest conservation impact, and transparency metrics for that area.
                             </p>
-                            <AtlasMap />
+                            <AtlasMap onAnalysisComplete={setRegionAnalysis} />
                         </div>
 
                         {/* Transparency Metrics */}

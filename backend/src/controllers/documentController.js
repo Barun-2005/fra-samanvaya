@@ -1,29 +1,34 @@
 const Document = require('../models/Document');
-const { extractClaimData } = require('../services/geminiOCR');
+const { processDocument } = require('../services/documentProcessor');
 const fs = require('fs');
 
 exports.uploadDocument = async (req, res) => {
   const { claimId } = req.body;
-  const file = req.file; // Fix: req.file is direct property, not nested
+  const file = req.file;
 
   if (!file || !claimId) {
     return res.status(400).json({ message: 'Missing file or claimId' });
   }
 
   try {
-    // Read file buffer for Gemini
-    const fileBuffer = fs.readFileSync(file.path);
-
-    // Extract data using Gemini OCR
-    const extractedData = await extractClaimData(fileBuffer, file.mimetype);
+    // Run the "One-Up" Document Intelligence Pipeline
+    const { fingerprint, cleanBuffer, extractionResult } = await processDocument(file);
 
     const document = new Document({
       claim: claimId,
       uploader: req.user.id,
       fileRef: file.path,
-      extractedData: extractedData, // Store structured JSON
-      ocrText: JSON.stringify(extractedData), // Legacy field for compatibility
-      ocrConfidence: extractedData.confidence || 0.8,
+
+      // Tier 2: Duplicate Detection
+      fileFingerprint: fingerprint,
+
+      // Tier 3: Smart Extraction
+      metadata: extractionResult,
+      anomalies: extractionResult.anomalies || [],
+
+      // Legacy fields for compatibility
+      ocrText: JSON.stringify(extractionResult.extractedData),
+      ocrConfidence: extractionResult.confidence || 0.8,
     });
 
     await document.save();
@@ -31,10 +36,21 @@ exports.uploadDocument = async (req, res) => {
     res.status(201).json({
       message: 'Document processed successfully',
       document: document,
-      extractedData: extractedData
+      extractedData: extractionResult.extractedData,
+      anomalies: extractionResult.anomalies
     });
+
   } catch (error) {
     console.error('Document processing error:', error);
+
+    // Handle Duplicate Document Error
+    if (error.code === 'DUPLICATE_DOCUMENT') {
+      return res.status(409).json({
+        message: 'Duplicate Document Detected',
+        existingDocId: error.existingDocId
+      });
+    }
+
     res.status(500).json({ message: 'Error processing document', error: error.message });
   }
 };
@@ -47,14 +63,17 @@ exports.extractDataOnly = async (req, res) => {
   }
 
   try {
-    // Read file buffer for Gemini
-    const fileBuffer = fs.readFileSync(file.path);
+    const fs = require('fs');
+    const rawBuffer = fs.readFileSync(file.path);
 
-    // Extract data using Gemini OCR
-    const extractedData = await extractClaimData(fileBuffer, file.mimetype);
+    // 1. Tier 1: Normalize
+    const { preProcessImage, extractSmartData } = require('../services/documentProcessor');
+    const cleanBuffer = await preProcessImage(rawBuffer);
 
-    // We don't save to DB here, just return the data
-    // Clean up the uploaded file since we're not saving it yet
+    // 2. Tier 3: Extract
+    const extractionResult = await extractSmartData(cleanBuffer, file.mimetype);
+
+    // Clean up temp file
     try {
       fs.unlinkSync(file.path);
     } catch (e) {
@@ -63,7 +82,8 @@ exports.extractDataOnly = async (req, res) => {
 
     res.status(200).json({
       message: 'Data extracted successfully',
-      extractedData: extractedData
+      extractedData: extractionResult.extractedData,
+      anomalies: extractionResult.anomalies
     });
   } catch (error) {
     console.error('Extraction error:', error);
