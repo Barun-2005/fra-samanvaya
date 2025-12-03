@@ -45,6 +45,32 @@ exports.getRecommendations = async (req, res) => {
             error: error.message
         });
     }
+}
+
+
+/**
+ * Get scheme recommendations from profile data (no claim ID needed)
+ */
+exports.getRecommendationsFromProfile = async (req, res) => {
+    try {
+        const { claimantData, assetData } = req.body;
+
+        if (!claimantData) {
+            return res.status(400).json({ message: 'Claimant data is required' });
+        }
+
+        // Get recommendations from Gemini DSS
+        const recommendations = await recommendSchemes(claimantData, assetData || {});
+
+        res.status(200).json(recommendations);
+
+    } catch (error) {
+        console.error('Scheme recommendation error:', error);
+        res.status(500).json({
+            message: 'Failed to generate recommendations',
+            error: error.message
+        });
+    }
 };
 
 /**

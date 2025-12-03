@@ -28,11 +28,158 @@ const AtlasMap = dynamic(() => import('../../src/components/Atlas/AtlasMap'), {
     loading: () => <div className="h-[500px] bg-slate-100 dark:bg-slate-800 animate-pulse rounded-xl" />
 });
 
+// Dynamic import for SmartSchemeBuilder to avoid SSR issues if any
+const SmartSchemeBuilder = dynamic(() => import('../../src/components/Schemes/SmartSchemeBuilder'), {
+    ssr: false
+});
+
+// Dynamic import for ImpactAnalytics
+const ImpactAnalytics = dynamic(() => import('../../src/components/Dashboard/ImpactAnalytics'), {
+    ssr: false
+});
+
+// Dynamic import for PolicySimulator
+const PolicySimulator = dynamic(() => import('../../src/components/Schemes/PolicySimulator'), {
+    ssr: false
+});
+
+// Add Scheme Modal Component
+function AddSchemeModal({ onClose, onAdd }) {
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        category: 'Agriculture',
+        budget: '',
+        beneficiaries: '',
+        status: 'Active',
+        rules: []
+    });
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const api = require('../../src/lib/api').default;
+            await api.post('/schemes', formData);
+            onAdd();
+            onClose();
+        } catch (err) {
+            console.error(err);
+            alert('Failed to add scheme');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h2 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">Add New Scheme</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Scheme Name</label>
+                            <input
+                                required
+                                className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Category</label>
+                            <select
+                                className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white"
+                                value={formData.category}
+                                onChange={e => setFormData({ ...formData, category: e.target.value })}
+                            >
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Housing">Housing</option>
+                                <option value="Education">Education</option>
+                                <option value="Health">Health</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Description</label>
+                        <textarea
+                            required
+                            className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white min-h-[80px]"
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                        />
+                    </div>
+
+                    {/* Smart Rules Builder */}
+                    <SmartSchemeBuilder
+                        value={formData.rules}
+                        onChange={(rules) => setFormData({ ...formData, rules })}
+                    />
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Status</label>
+                            <select
+                                className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white"
+                                value={formData.status}
+                                onChange={e => setFormData({ ...formData, status: e.target.value })}
+                            >
+                                <option value="Active">Active</option>
+                                <option value="Draft">Draft</option>
+                                <option value="Expired">Expired</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Budget (₹)</label>
+                            <input
+                                required
+                                className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white"
+                                value={formData.budget}
+                                onChange={e => setFormData({ ...formData, budget: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Beneficiaries</label>
+                            <input
+                                type="number"
+                                required
+                                className="w-full p-2 rounded border border-slate-300 dark:border-slate-700 bg-transparent text-slate-900 dark:text-white"
+                                value={formData.beneficiaries}
+                                onChange={e => setFormData({ ...formData, beneficiaries: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover disabled:opacity-50 font-bold"
+                        >
+                            {loading ? 'Adding...' : 'Create Smart Scheme'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+}
+
 export default function SchemeAdminDashboard() {
     const { user } = useAuth();
     const [schemes, setSchemes] = useState([]);
     const [stats, setStats] = useState({ totalClaims: 0, eligibleClaims: 0, schemesActive: 12 });
     const [loading, setLoading] = useState(true);
+    const [showAddModal, setShowAddModal] = useState(false);
 
     useEffect(() => {
         fetchData();
@@ -84,7 +231,10 @@ export default function SchemeAdminDashboard() {
                                     Manage government schemes and analyze performance.
                                 </p>
                             </div>
-                            <button className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20">
+                            <button
+                                onClick={() => setShowAddModal(true)}
+                                className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                            >
                                 <Plus className="w-5 h-5" />
                                 Add New Scheme
                             </button>
@@ -134,6 +284,9 @@ export default function SchemeAdminDashboard() {
 
                         {/* Main Content Grid */}
                         <div className="space-y-8">
+                            {/* Impact Analytics */}
+                            <ImpactAnalytics schemes={schemes} />
+
                             {/* Regional Budget Planner with GIS */}
                             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                                 <div className="flex items-center gap-2 mb-4">
@@ -146,10 +299,8 @@ export default function SchemeAdminDashboard() {
                                 <AtlasMap />
                             </div>
 
-                            {/* Policy Matcher Section */}
-                            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                                <PolicyMatcherPanel />
-                            </div>
+                            {/* Policy Simulator Section */}
+                            <PolicySimulator />
 
                             {/* Scheme Analysis */}
                             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
@@ -199,6 +350,13 @@ export default function SchemeAdminDashboard() {
                         </div>
                     </div>
                 </div>
+
+                {showAddModal && (
+                    <AddSchemeModal
+                        onClose={() => setShowAddModal(false)}
+                        onAdd={fetchData}
+                    />
+                )}
             </DashboardLayout>
         </RoleGuard>
     );
