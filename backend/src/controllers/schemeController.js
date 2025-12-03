@@ -50,37 +50,27 @@ exports.getRecommendations = async (req, res) => {
 /**
  * Get all available schemes (static list)
  */
-exports.getAllSchemes = (req, res) => {
-    const schemes = [
-        {
-            name: 'Forest Rights Act',
-            description: 'Recognition of forest rights',
-            eligibility: 'Forest dwelling scheduled tribes and traditional forest dwellers',
-            benefit: 'Land title deed'
-        },
-        {
-            name: 'MGNREGA',
-            description: 'Mahatma Gandhi National Rural Employment Guarantee Act',
-            eligibility: 'Rural households',
-            benefit: '100 days of wage employment'
-        },
-        {
-            name: 'Kisan Credit Card',
-            description: 'Agricultural credit for farmers',
-            eligibility: 'Farmers with landholding',
-            benefit: 'Low-interest agricultural credit'
-        }
-    ];
+const Scheme = require('../models/Scheme');
 
-    res.status(200).json({ schemes });
+/**
+ * Get all available schemes
+ */
+exports.getAllSchemes = async (req, res) => {
+    try {
+        const schemes = await Scheme.find().sort({ createdAt: -1 });
+        res.status(200).json({ schemes });
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching schemes' });
+    }
 };
 
 exports.createScheme = async (req, res) => {
     try {
-        // Mock creation for now
-        res.status(201).json({ message: 'Scheme created' });
+        const scheme = new Scheme(req.body);
+        await scheme.save();
+        res.status(201).json(scheme);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating scheme' });
+        res.status(500).json({ message: 'Error creating scheme', error: error.message });
     }
 };
 

@@ -33,12 +33,19 @@ export default function DataEntryDashboard() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/claims?limit=10&sort=latest');
+            const response = await api.get('/claims'); // Fetch all to calc stats
             const claims = response.data.data || response.data;
-            setRecentClaims(Array.isArray(claims) ? claims : []);
+            const claimsArray = Array.isArray(claims) ? claims : [];
 
-            // Mock stats (replace with real API)
-            setStats({ today: 15, week: 78, month: 1234 });
+            setRecentClaims(claimsArray.slice(0, 10)); // Only show recent 10 in table
+
+            // Calculate real stats
+            const today = new Date().toDateString();
+            setStats({
+                pending: claimsArray.filter(c => c.status === 'Submitted' || c.status === 'ConflictDetected').length,
+                today: claimsArray.filter(c => new Date(c.createdAt).toDateString() === today).length,
+                total: claimsArray.length
+            });
         } catch (err) {
             console.error('Error:', err);
         } finally {
@@ -90,7 +97,7 @@ export default function DataEntryDashboard() {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                             <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2">
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">Pending Verification</p>
-                                <p className="text-4xl font-bold text-slate-900 dark:text-white">42</p>
+                                <p className="text-4xl font-bold text-slate-900 dark:text-white">{stats.pending}</p>
                             </div>
                             <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2">
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">Today's Entries</p>
@@ -98,7 +105,7 @@ export default function DataEntryDashboard() {
                             </div>
                             <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-2">
                                 <p className="text-slate-500 dark:text-slate-400 font-medium">Total Claims</p>
-                                <p className="text-4xl font-bold text-slate-900 dark:text-white">{stats.month}</p>
+                                <p className="text-4xl font-bold text-slate-900 dark:text-white">{stats.total}</p>
                             </div>
                         </div>
 

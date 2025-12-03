@@ -59,6 +59,13 @@ const claimSchema = new mongoose.Schema({
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+
+  // AI Embeddings
+  embedding: { type: [Number], index: true }, // For Vector Search
+
+  // AI Insights
+  veracityScore: { type: Number, default: 0 }, // 0-100
+  eligibleSchemes: [{ type: String }], // List of scheme names
 });
 
 const Claim = mongoose.model('Claim', claimSchema);

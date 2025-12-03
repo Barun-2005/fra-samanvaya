@@ -311,30 +311,38 @@ exports.rejectClaim = async (req, res) => {
     res.status(500).json({ message: 'Error rejecting claim', error: error.message });
   }
 };
-// Find similar approved claims (Precedents)
+// Find similar approved claims (Precedents) - NOW WITH VECTOR SEARCH
 exports.findSimilarClaims = async (req, res) => {
   try {
-    const { village, district, claimType } = req.query;
+    const { text } = req.query; // Expecting 'text' query param for vector search
 
-    if (!village && !district) {
-      return res.status(400).json({ message: 'Village or District is required' });
+    if (!text) {
+      // Fallback to old regex search if no text provided
+      const { village, district, claimType } = req.query;
+      if (!village && !district) {
+        return res.status(400).json({ message: 'Text or Village/District is required' });
+      }
+      const query = {
+        status: 'Approved',
+        _id: { $ne: req.params.id }
+      };
+      if (village) query.village = { $regex: village, $options: 'i' };
+      if (district) query.district = { $regex: district, $options: 'i' };
+      if (claimType) query.claimType = claimType;
+
+      const similarClaims = await Claim.find(query)
+        .select('claimantName village landSizeClaimed approvedAt claimType reasonForClaim')
+        .sort({ approvedAt: -1 })
+        .limit(5);
+      return res.json(similarClaims);
     }
 
-    const query = {
-      status: 'Approved',
-      _id: { $ne: req.params.id } // Exclude current claim if ID is passed
-    };
-
-    if (village) query.village = { $regex: village, $options: 'i' };
-    if (district) query.district = { $regex: district, $options: 'i' };
-    if (claimType) query.claimType = claimType;
-
-    const similarClaims = await Claim.find(query)
-      .select('claimantName village landSizeClaimed approvedAt claimType')
-      .sort({ approvedAt: -1 })
-      .limit(5);
+    // Use Vector Search
+    const { findSimilarClaims } = require('../services/ragService');
+    const similarClaims = await findSimilarClaims(text);
 
     res.json(similarClaims);
+
   } catch (error) {
     console.error('Find similar claims error:', error);
     res.status(500).json({ message: 'Error finding similar claims' });

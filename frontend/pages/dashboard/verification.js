@@ -43,12 +43,14 @@ export default function VerificationDashboard() {
             const submitted = claimsArray.filter(c => c.status === 'Submitted');
             setQueue(submitted);
 
-            // Mock stats for now (replace with real API if available)
-            setStats({
+            // Calculate real stats
+            const stats = {
                 pending: submitted.length,
-                todayVerified: 5,
-                totalVerified: 124
-            });
+                todayVerified: claimsArray.filter(c => c.status === 'Verified' && new Date(c.verifiedAt).toDateString() === new Date().toDateString()).length,
+                totalVerified: claimsArray.filter(c => c.status === 'Verified').length
+            };
+            setStats(stats);
+
         } catch (err) {
             console.error('Error:', err);
         } finally {
@@ -61,6 +63,10 @@ export default function VerificationDashboard() {
         claim._id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         claim.village?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    // Dynamic Alerts
+    const lowVeracityClaims = queue.filter(c => (c.veracityScore || 0) < 50).length;
+    const highPriorityClaims = queue.length;
 
     return (
         <RoleGuard allowedRoles={['Verification Officer']}>
@@ -207,9 +213,16 @@ export default function VerificationDashboard() {
                                                     <div className="text-xs text-slate-500 mb-1">Veracity Score</div>
                                                     <div className="flex items-center gap-2">
                                                         <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                            <div className="h-full bg-green-500 w-[85%] rounded-full"></div>
+                                                            <div
+                                                                className={`h-full w-[${claim.veracityScore || 0}%] rounded-full ${(claim.veracityScore || 0) > 70 ? 'bg-green-500' :
+                                                                        (claim.veracityScore || 0) > 40 ? 'bg-yellow-500' : 'bg-red-500'
+                                                                    }`}
+                                                                style={{ width: `${claim.veracityScore || 0}%` }}
+                                                            ></div>
                                                         </div>
-                                                        <span className="text-sm font-bold text-green-600">85%</span>
+                                                        <span className={`text-sm font-bold ${(claim.veracityScore || 0) > 70 ? 'text-green-600' :
+                                                                (claim.veracityScore || 0) > 40 ? 'text-yellow-600' : 'text-red-600'
+                                                            }`}>{claim.veracityScore || 0}%</span>
                                                     </div>
                                                 </div>
                                                 <div className="flex gap-2">
@@ -242,28 +255,35 @@ export default function VerificationDashboard() {
                                 Priority Alerts
                             </h3>
                             <div className="space-y-3">
-                                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-lg">
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-2 h-2 mt-2 rounded-full bg-red-500 flex-shrink-0"></div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-900 dark:text-white">High Conflict Zone</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                                3 claims in Rampur overlap with protected forest area.
-                                            </p>
+                                {lowVeracityClaims > 0 && (
+                                    <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-lg">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-2 h-2 mt-2 rounded-full bg-red-500 flex-shrink-0"></div>
+                                            <div>
+                                                <p className="text-sm font-medium text-slate-900 dark:text-white">Low Veracity Claims</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                    {lowVeracityClaims} claims have a low AI veracity score. Please investigate thoroughly.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-lg">
-                                    <div className="flex items-start gap-3">
-                                        <div className="w-2 h-2 mt-2 rounded-full bg-amber-500 flex-shrink-0"></div>
-                                        <div>
-                                            <p className="text-sm font-medium text-slate-900 dark:text-white">Pending Verification</p>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                                5 claims exceeding 45 days SLA.
-                                            </p>
+                                )}
+                                {highPriorityClaims > 0 && (
+                                    <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-lg">
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-2 h-2 mt-2 rounded-full bg-amber-500 flex-shrink-0"></div>
+                                            <div>
+                                                <p className="text-sm font-medium text-slate-900 dark:text-white">Pending Verification</p>
+                                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                                    {highPriorityClaims} claims are awaiting field verification.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                )}
+                                {lowVeracityClaims === 0 && highPriorityClaims === 0 && (
+                                    <p className="text-sm text-slate-500">No active alerts.</p>
+                                )}
                             </div>
                         </div>
                     </div>

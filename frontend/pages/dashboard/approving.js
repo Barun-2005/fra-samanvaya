@@ -43,12 +43,14 @@ export default function ApprovalDashboard() {
             const verified = claimsArray.filter(c => c.status === 'Verified');
             setApprovalQueue(verified);
 
-            // Mock stats
-            setStats({
+            // Calculate real stats
+            const stats = {
                 pending: verified.length,
-                approved: 1204,
-                rejected: 87
-            });
+                approved: claimsArray.filter(c => c.status === 'Approved').length,
+                rejected: claimsArray.filter(c => c.status === 'Rejected').length
+            };
+            setStats(stats);
+
         } catch (err) {
             console.error('Error:', err);
         } finally {
@@ -227,13 +229,20 @@ export default function ApprovalDashboard() {
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                                                <div className="h-full bg-green-500 w-[92%]"></div>
+                                                                <div
+                                                                    className={`h-full w-[${claim.veracityScore || 0}%] ${(claim.veracityScore || 0) > 70 ? 'bg-green-500' :
+                                                                            (claim.veracityScore || 0) > 40 ? 'bg-yellow-500' : 'bg-red-500'
+                                                                        }`}
+                                                                    style={{ width: `${claim.veracityScore || 0}%` }}
+                                                                ></div>
                                                             </div>
-                                                            <span className="font-bold text-green-600 text-xs">92%</span>
+                                                            <span className={`font-bold text-xs ${(claim.veracityScore || 0) > 70 ? 'text-green-600' :
+                                                                    (claim.veracityScore || 0) > 40 ? 'text-yellow-600' : 'text-red-600'
+                                                                }`}>{claim.veracityScore || 0}%</span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-xs">
-                                                        SDLC Officer
+                                                        {claim.verifiedBy?.fullName || 'SDLC Officer'}
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         <div className="flex justify-center items-center gap-2">

@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import AuthGuard from '../../src/components/Layout/AuthGuard';
@@ -20,7 +20,10 @@ import {
   ArrowLeft,
   Check,
   X,
-  Edit
+  Edit,
+  Shield,
+  Scale,
+  Send
 } from 'lucide-react';
 
 // Dynamic import for Map to avoid SSR issues
@@ -41,11 +44,22 @@ const ClaimDetailPage = () => {
   const [actionLoading, setActionLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
+  // New State for AI Features
+  const [similarClaims, setSimilarClaims] = useState([]);
+  const [showLegalAdvisor, setShowLegalAdvisor] = useState(false);
+
   useEffect(() => {
     if (router.isReady && id) {
       fetchClaim();
     }
   }, [router.isReady, id]);
+
+  // Fetch similar claims when claim is loaded
+  useEffect(() => {
+    if (claim && (user?.roles.includes('Approving Authority') || user?.roles.includes('Verification Officer'))) {
+      fetchSimilarClaims();
+    }
+  }, [claim, user]);
 
   const fetchClaim = async () => {
     try {
@@ -61,12 +75,25 @@ const ClaimDetailPage = () => {
     }
   };
 
+  const fetchSimilarClaims = async () => {
+    try {
+      // Use the new vector search endpoint
+      const response = await api.get(`/claims/similar?text=${encodeURIComponent(claim.reasonForClaim || '')}&village=${claim.village}&district=${claim.district}&claimType=${claim.claimType}`);
+      setSimilarClaims(response.data);
+    } catch (err) {
+      console.error('Error fetching similar claims:', err);
+    }
+  };
+
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [showApproveModal, setShowApproveModal] = useState(false);
+
   const handleVerify = async () => {
-    if (!confirm('Are you sure you want to verify this claim?')) return;
     try {
       setActionLoading(true);
       await api.post(`/claims/${id}/verify`, { notes: 'Claim verified by officer' });
       toast.success('Claim verified successfully!');
+      setShowVerifyModal(false);
       await fetchClaim();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to verify claim');
@@ -76,11 +103,11 @@ const ClaimDetailPage = () => {
   };
 
   const handleApprove = async () => {
-    if (!confirm('Are you sure you want to approve this claim?')) return;
     try {
       setActionLoading(true);
       await api.post(`/claims/${id}/approve`, { notes: 'Claim approved' });
       toast.success('Claim approved successfully!');
+      setShowApproveModal(false);
       await fetchClaim();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to approve claim');
@@ -176,6 +203,16 @@ const ClaimDetailPage = () => {
               </div>
 
               <div className="flex items-center gap-3">
+                {/* AI Legal Advisor Button */}
+                {(canApprove || canVerify) && (
+                  <button
+                    onClick={() => setShowLegalAdvisor(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-600/20"
+                  >
+                    <Shield className="w-5 h-5" /> Consult AI
+                  </button>
+                )}
+
                 {canReject && (
                   <button
                     onClick={() => setShowRejectModal(true)}
@@ -186,7 +223,7 @@ const ClaimDetailPage = () => {
                 )}
                 {canVerify && (
                   <button
-                    onClick={handleVerify}
+                    onClick={() => setShowVerifyModal(true)}
                     disabled={actionLoading}
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
                   >
@@ -195,7 +232,7 @@ const ClaimDetailPage = () => {
                 )}
                 {canApprove && (
                   <button
-                    onClick={handleApprove}
+                    onClick={() => setShowApproveModal(true)}
                     disabled={actionLoading}
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20"
                   >
@@ -294,7 +331,7 @@ const ClaimDetailPage = () => {
                   {activeTab === 'overview' && (
                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                       {/* Conflict Warning */}
-                      {claim.geojson && (
+                      {claim.status === 'ConflictDetected' && (
                         <div className="flex items-start gap-4 p-4 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/30 dark:bg-amber-900/10">
                           <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
                           <div>
@@ -302,6 +339,45 @@ const ClaimDetailPage = () => {
                             <p className="text-sm text-amber-800 dark:text-amber-300 mt-1">
                               AI has detected an overlap with a protected forest area. Please review the map carefully.
                             </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* PRECEDENTS SECTION (New) */}
+                      {(canApprove || canVerify) && similarClaims.length > 0 && (
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+                          <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                            <Scale className="w-5 h-5 text-indigo-600" />
+                            Similar Claims Analysis (Precedents)
+                          </h3>
+                          <div className="space-y-4">
+                            {similarClaims.map((sim, idx) => (
+                              <div key={idx} className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-100 dark:border-slate-700">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <p className="font-bold text-slate-900 dark:text-white">{sim.claimantName}</p>
+                                    <p className="text-xs text-slate-500">{sim.village} • {new Date(sim.approvedAt).toLocaleDateString()}</p>
+                                  </div>
+                                  <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-full">
+                                    Approved
+                                  </span>
+                                </div>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 mb-2">
+                                  "{sim.reasonForClaim?.substring(0, 100)}..."
+                                </p>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-1.5 flex-1 bg-slate-200 rounded-full overflow-hidden">
+                                    <div
+                                      className="h-full bg-indigo-500"
+                                      style={{ width: `${(sim.score || 0.85) * 100}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-xs font-bold text-indigo-600">
+                                    {Math.round((sim.score || 0.85) * 100)}% Match
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       )}
@@ -320,12 +396,20 @@ const ClaimDetailPage = () => {
                             <div className="relative w-24 h-24 flex items-center justify-center">
                               <svg className="w-full h-full transform -rotate-90">
                                 <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100 dark:text-slate-800" />
-                                <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={251.2} strokeDashoffset={251.2 * (1 - 0.82)} className="text-green-500" />
+                                <circle
+                                  cx="48" cy="48" r="40"
+                                  stroke="currentColor" strokeWidth="8" fill="transparent"
+                                  strokeDasharray={251.2}
+                                  strokeDashoffset={251.2 * (1 - ((claim.veracityScore || 0) / 100))}
+                                  className={`${(claim.veracityScore || 0) > 70 ? 'text-green-500' : (claim.veracityScore || 0) > 40 ? 'text-yellow-500' : 'text-red-500'}`}
+                                />
                               </svg>
-                              <span className="absolute text-2xl font-bold text-slate-900 dark:text-white">82%</span>
+                              <span className="absolute text-2xl font-bold text-slate-900 dark:text-white">{claim.veracityScore || 0}%</span>
                             </div>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                              High consistency between submitted documents and historical records.
+                              {(claim.veracityScore || 0) > 80 ? 'High consistency between submitted documents and historical records.' :
+                                (claim.veracityScore || 0) > 50 ? 'Moderate consistency. Some documents may need manual verification.' :
+                                  'Low consistency detected. Detailed field verification recommended.'}
                             </p>
                           </div>
                         </div>
@@ -333,14 +417,16 @@ const ClaimDetailPage = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
                           <h3 className="font-bold text-slate-900 dark:text-white mb-4">Scheme Eligibility</h3>
                           <div className="space-y-3">
-                            <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                              <CheckCircle className="w-5 h-5 text-green-500" />
-                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">PM Kisan Samman Nidhi</span>
-                            </div>
-                            <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                              <CheckCircle className="w-5 h-5 text-green-500" />
-                              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">National Bamboo Mission</span>
-                            </div>
+                            {claim.eligibleSchemes && claim.eligibleSchemes.length > 0 ? (
+                              claim.eligibleSchemes.map((scheme, idx) => (
+                                <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                                  <CheckCircle className="w-5 h-5 text-green-500" />
+                                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{scheme}</span>
+                                </div>
+                              ))
+                            ) : (
+                              <p className="text-sm text-slate-500 dark:text-slate-400">No specific schemes identified at this stage.</p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -397,6 +483,26 @@ const ClaimDetailPage = () => {
           </div>
         </div>
 
+        {/* Legal Advisor Modal (Context Aware) */}
+        {showLegalAdvisor && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-2xl w-full h-[600px] flex flex-col animate-in zoom-in-95 duration-200">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center bg-indigo-700 text-white rounded-t-xl">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  <h3 className="font-bold">AI Legal Advisor - Case Specific</h3>
+                </div>
+                <button onClick={() => setShowLegalAdvisor(false)} className="hover:bg-indigo-600 p-1 rounded">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 p-0 overflow-hidden">
+                <LegalAdvisorChat claim={claim} />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Reject Modal */}
         {showRejectModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -427,8 +533,119 @@ const ClaimDetailPage = () => {
             </div>
           </div>
         )}
+        {/* Verify Modal */}
+        {showVerifyModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Verify Claim</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+                Are you sure you want to verify this claim? This will move the claim to the Approval stage.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowVerifyModal(false)}
+                  className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-bold hover:bg-slate-200 dark:hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleVerify}
+                  disabled={actionLoading}
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary-hover disabled:opacity-50"
+                >
+                  Confirm Verify
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Approve Modal */}
+        {showApproveModal && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Approve Claim</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
+                Are you sure you want to approve this claim? This action is final and will generate the Title Deed.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowApproveModal(false)}
+                  className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg font-bold hover:bg-slate-200 dark:hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleApprove}
+                  disabled={actionLoading}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 disabled:opacity-50"
+                >
+                  Confirm Approve
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </DashboardLayout>
     </>
+  );
+};
+
+// Inline Chat Component for the Modal
+const LegalAdvisorChat = ({ claim }) => {
+  const [messages, setMessages] = useState([
+    { role: 'assistant', text: `I have analyzed the claim for ${claim.claimantName}. How can I assist you with the verification or approval process?` }
+  ]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => { scrollRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
+
+  const send = async () => {
+    if (!input.trim()) return;
+    const text = input;
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text }]);
+    setLoading(true);
+    try {
+      const res = await api.post('/knowledge-base/query', {
+        query: text,
+        roleContext: `You are a legal expert analyzing Claim #${claim._id} for ${claim.claimantName}. Reason: "${claim.reasonForClaim}". Focus on FRA 2006 compliance.`
+      });
+      setMessages(prev => [...prev, { role: 'assistant', text: res.data.answer, sources: res.data.sources }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', text: "Error connecting to AI." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[80%] p-3 rounded-lg ${m.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700'}`}>
+              <p className="text-sm whitespace-pre-wrap">{m.text}</p>
+              {m.sources && <div className="mt-2 text-xs opacity-70">Sources: {m.sources.join(', ')}</div>}
+            </div>
+          </div>
+        ))}
+        {loading && <div className="text-center text-xs text-slate-500">AI is thinking...</div>}
+        <div ref={scrollRef} />
+      </div>
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex gap-2">
+        <input
+          className="flex-1 border rounded-lg px-3 py-2 text-sm"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && send()}
+          placeholder="Ask about this claim..."
+        />
+        <button onClick={send} disabled={loading} className="bg-indigo-600 text-white p-2 rounded-lg"><Send className="w-4 h-4" /></button>
+      </div>
+    </div>
   );
 };
 

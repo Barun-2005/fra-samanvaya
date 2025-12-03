@@ -41,22 +41,22 @@ export default function SchemeAdminDashboard() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/claims');
-            const claims = response.data.data || response.data;
-            const claimsArray = Array.isArray(claims) ? claims : [];
+            const [claimsRes, schemesRes] = await Promise.all([
+                api.get('/claims'),
+                api.get('/schemes')
+            ]);
+
+            const claims = claimsRes.data.data || claimsRes.data || [];
+            const schemesList = schemesRes.data.schemes || [];
+
+            setSchemes(schemesList);
 
             setStats({
-                totalClaims: claimsArray.length,
-                eligibleClaims: claimsArray.filter(c => c.status === 'Approved').length,
-                schemesActive: 12 // Mock for now
+                totalClaims: claims.length,
+                eligibleClaims: claims.filter(c => c.status === 'Approved').length,
+                schemesActive: schemesList.filter(s => s.status === 'Active').length
             });
 
-            // Mock scheme data
-            setSchemes([
-                { id: 1, name: 'Forest Rights Act 2006', beneficiaries: 12500, status: 'Active', budget: '₹50 Cr' },
-                { id: 2, name: 'PM Van Dhan Yojana', beneficiaries: 8200, status: 'Active', budget: '₹25 Cr' },
-                { id: 3, name: 'Eco-Tourism Initiative', beneficiaries: 1500, status: 'Draft', budget: '₹10 Cr' },
-            ]);
         } catch (err) {
             console.error('Error:', err);
         } finally {

@@ -131,7 +131,62 @@ const queryKnowledgeBase = async (query, roleContext = "You are a helpful assist
     }
 };
 
+/**
+ * Find similar claims based on vector similarity
+ * @param {string} claimText - The text description of the claim to match
+ * @returns {Promise<Array>} - List of similar claims with scores
+ */
+const findSimilarClaims = async (claimText) => {
+    try {
+        const Claim = require('../models/Claim'); // Lazy load to avoid circular deps
+
+        // 1. Generate embedding for the query text
+        const queryEmbedding = await generateEmbedding(claimText);
+
+        // 2. Vector Search on Claims collection
+        const pipeline = [
+            {
+                "$vectorSearch": {
+                    "index": "claim_vector_index", // User needs to create this index in Atlas
+                    "path": "embedding",
+                    "queryVector": queryEmbedding,
+                    "numCandidates": 100,
+                    "limit": 5
+                }
+            },
+            {
+                "$project": {
+                    "claimantName": 1,
+                    "village": 1,
+                    "status": 1,
+                    "claimType": 1,
+                    "reasonForClaim": 1,
+                    "score": { "$meta": "vectorSearchScore" }
+                }
+            }
+        ];
+
+        let similarClaims = [];
+        try {
+            similarClaims = await Claim.aggregate(pipeline);
+        } catch (err) {
+            console.warn("Claim vector search failed. Falling back to basic find.", err.message);
+            // Fallback: Basic text search if vector index is missing
+            similarClaims = await Claim.find({
+                reasonForClaim: { $regex: claimText.split(' ')[0], $options: 'i' }
+            }).limit(3);
+        }
+
+        return similarClaims;
+
+    } catch (error) {
+        console.error("Error finding similar claims:", error);
+        throw error;
+    }
+};
+
 module.exports = {
     ingestDocument,
-    queryKnowledgeBase
+    queryKnowledgeBase,
+    findSimilarClaims
 };
