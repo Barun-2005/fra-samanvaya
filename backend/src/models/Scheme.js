@@ -20,6 +20,9 @@ const schemeSchema = new mongoose.Schema({
     amount: { type: Number },
     description: { type: String }
   }],
+  // DA-JGUA Convergence Support
+  convergenceType: { type: String, default: 'General' }, // 'DA-JGUA', 'State', 'General'
+  triggerOnStatus: { type: String }, // e.g., 'Title_Issued'
   createdAt: { type: Date, default: Date.now },
 });
 

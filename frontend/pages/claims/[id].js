@@ -23,9 +23,18 @@ import {
   Edit,
   Shield,
   Scale,
-  Send
+  Send,
+  RotateCcw,
+  Users
 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+
+// Phase 5: Statutory Compliance Components
+import RemandPanel from '../../src/components/Claims/RemandPanel';
+import TitleDeedDownload from '../../src/components/Claims/TitleDeedDownload';
+import GramSabhaResolutionForm from '../../src/components/Claims/GramSabhaResolutionForm';
+import JointVerificationForm from '../../src/components/Claims/JointVerificationForm';
+
 
 // Dynamic import for Map to avoid SSR issues
 const ClaimBoundaryMap = dynamic(
@@ -48,6 +57,13 @@ const ClaimDetailPage = () => {
   // New State for AI Features
   const [similarClaims, setSimilarClaims] = useState([]);
   const [showLegalAdvisor, setShowLegalAdvisor] = useState(false);
+
+  // Phase 5: Statutory Compliance Panel States
+  const [showRemandPanel, setShowRemandPanel] = useState(false);
+  const [showGramSabhaForm, setShowGramSabhaForm] = useState(false);
+  const [showJointVerifyForm, setShowJointVerifyForm] = useState(false);
+  const [showTitleDeedPanel, setShowTitleDeedPanel] = useState(false);
+
 
   useEffect(() => {
     if (router.isReady && id) {
@@ -166,6 +182,17 @@ const ClaimDetailPage = () => {
   const canReject = (user?.roles.includes('Verification Officer') || user?.roles.includes('Approving Authority'))
     && (claim.status === 'Submitted' || claim.status === 'Verified');
 
+  // Phase 5: Statutory Compliance Permissions
+  const canRecordGramSabha = (user?.roles.includes('Citizen') || user?.roles.includes('Data Entry') || user?.roles.includes('Super Admin'))
+    && ['Submitted', 'Remanded'].includes(claim.status);
+  const canJointVerify = (user?.roles.includes('Field Worker') || user?.roles.includes('Verification Officer') || user?.roles.includes('Super Admin'))
+    && claim.status === 'GramSabhaApproved';
+  const canRemand = (user?.roles.includes('Verification Officer') || user?.roles.includes('Approving Authority') || user?.roles.includes('Super Admin'))
+    && ['SDLC_Scrutiny', 'Verified', 'InVerification'].includes(claim.status);
+  const canGenerateTitleDeed = (user?.roles.includes('Approving Authority') || user?.roles.includes('Super Admin'))
+    && claim.status === 'Approved';
+
+
   return (
     <>
       <Head>
@@ -238,6 +265,40 @@ const ClaimDetailPage = () => {
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition-colors shadow-lg shadow-green-600/20"
                   >
                     <CheckCircle className="w-5 h-5" /> Approve Claim
+                  </button>
+                )}
+
+                {/* Phase 5: Statutory Compliance Buttons */}
+                {canRecordGramSabha && (
+                  <button
+                    onClick={() => setShowGramSabhaForm(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-500 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors"
+                  >
+                    <Users className="w-5 h-5" /> Record Gram Sabha
+                  </button>
+                )}
+                {canJointVerify && (
+                  <button
+                    onClick={() => setShowJointVerifyForm(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-teal-500 text-white rounded-lg font-bold hover:bg-teal-600 transition-colors"
+                  >
+                    <Shield className="w-5 h-5" /> Joint Verification
+                  </button>
+                )}
+                {canRemand && (
+                  <button
+                    onClick={() => setShowRemandPanel(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg font-bold hover:bg-amber-600 transition-colors"
+                  >
+                    <RotateCcw className="w-5 h-5" /> Remand to GS
+                  </button>
+                )}
+                {canGenerateTitleDeed && (
+                  <button
+                    onClick={() => setShowTitleDeedPanel(true)}
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 transition-colors shadow-lg"
+                  >
+                    <FileText className="w-5 h-5" /> Generate Title Deed
                   </button>
                 )}
               </div>
@@ -575,6 +636,60 @@ const ClaimDetailPage = () => {
                   Confirm Approve
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Phase 5: Statutory Compliance Modals */}
+        {showRemandPanel && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto animate-in zoom-in-95 duration-200">
+              <RemandPanel
+                claim={claim}
+                onRemand={() => { setShowRemandPanel(false); fetchClaim(); }}
+                onCancel={() => setShowRemandPanel(false)}
+              />
+            </div>
+          </div>
+        )}
+
+        {showGramSabhaForm && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto animate-in zoom-in-95 duration-200">
+              <GramSabhaResolutionForm
+                claim={claim}
+                onComplete={() => { setShowGramSabhaForm(false); fetchClaim(); }}
+                onCancel={() => setShowGramSabhaForm(false)}
+              />
+            </div>
+          </div>
+        )}
+
+        {showJointVerifyForm && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-auto animate-in zoom-in-95 duration-200">
+              <JointVerificationForm
+                claim={claim}
+                onComplete={() => { setShowJointVerifyForm(false); fetchClaim(); }}
+                onCancel={() => setShowJointVerifyForm(false)}
+              />
+            </div>
+          </div>
+        )}
+
+        {showTitleDeedPanel && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl max-w-lg w-full p-6 animate-in zoom-in-95 duration-200">
+              <TitleDeedDownload
+                claim={claim}
+                onGenerated={() => { setShowTitleDeedPanel(false); fetchClaim(); }}
+              />
+              <button
+                onClick={() => setShowTitleDeedPanel(false)}
+                className="w-full mt-4 px-4 py-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg font-medium hover:bg-slate-200"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}

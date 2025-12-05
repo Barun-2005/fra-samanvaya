@@ -442,3 +442,383 @@ exports.getClaimRisk = async (req, res) => {
     res.status(500).json({ message: 'Error analyzing risk' });
   }
 };
+
+// ============================================
+// PHASE 5: STATUTORY COMPLIANCE FUNCTIONS
+// ============================================
+
+/**
+ * Remand a claim back to Gram Sabha (SDLC Duty)
+ * This is legally required before rejection in most cases
+ */
+exports.remandClaim = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { reason, targetStage } = req.body;
+
+    if (!reason) {
+      return res.status(400).json({ message: 'Remand reason is required' });
+    }
+
+    const claim = await Claim.findById(id);
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    // Only SDLC_Scrutiny or Approved claims can be remanded
+    if (!['SDLC_Scrutiny', 'Verified', 'InVerification'].includes(claim.status)) {
+      return res.status(400).json({
+        message: 'Only claims under scrutiny can be remanded',
+        currentStatus: claim.status
+      });
+    }
+
+    const previousStage = claim.status;
+
+    // Add to remand history
+    claim.remandHistory = claim.remandHistory || [];
+    claim.remandHistory.push({
+      date: new Date(),
+      reason: reason,
+      remandedBy: req.user.id,
+      fromStage: previousStage,
+      toStage: targetStage || 'GramSabhaApproved'
+    });
+
+    // Update status
+    claim.status = 'Remanded';
+
+    // Add to audit trail
+    claim.statusHistory.push({
+      status: 'Remanded',
+      changedBy: req.user.id,
+      changedAt: new Date(),
+      reason: `Remanded: ${reason}`
+    });
+
+    await claim.save();
+
+    // TODO: Trigger notification to Gram Sabha
+
+    res.json({
+      message: 'Claim remanded to Gram Sabha',
+      claim,
+      remandDetails: claim.remandHistory[claim.remandHistory.length - 1]
+    });
+  } catch (error) {
+    console.error('Remand claim error:', error);
+    res.status(500).json({ message: 'Error remanding claim', error: error.message });
+  }
+};
+
+/**
+ * Get AI-suggested remand reason from Vidhi
+ */
+exports.getRemandSuggestion = async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.id).populate('documents');
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    const { GoogleGenerativeAI } = require('@google/generative-ai');
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
+    const prompt = `
+    You are Vidhi, the legal governance AI for FRA (Forest Rights Act) claims.
+    Analyze this claim and suggest specific reasons why it might need to be remanded to the Gram Sabha for additional evidence.
+    
+    Claim Details:
+    - Claimant: ${claim.claimantName}
+    - Village: ${claim.village}
+    - Land Size: ${claim.landSizeClaimed} hectares
+    - Claim Type: ${claim.claimType}
+    - Reason for Claim: ${claim.reasonForClaim}
+    - Documents Count: ${claim.documents?.length || 0}
+    - Gram Sabha Resolution: ${claim.gramSabhaResolution?.resolutionNumber || 'Missing'}
+    - Joint Verification: ${claim.verificationReport?.forestOfficerSignature ? 'Complete' : 'Incomplete'}
+    
+    Provide exactly 3 potential remand reasons in JSON format:
+    [
+      { "reason": "Specific legal reason", "evidence_needed": "What Gram Sabha should provide" }
+    ]
+    Return only JSON, no markdown.
+    `;
+
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text();
+
+    let suggestions;
+    try {
+      suggestions = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
+    } catch (e) {
+      suggestions = [{ reason: 'Additional Gram Sabha verification required', evidence_needed: 'Updated resolution' }];
+    }
+
+    res.json({ suggestions, source: 'Vidhi AI' });
+  } catch (error) {
+    console.error('Remand suggestion error:', error);
+    res.status(500).json({ message: 'Error getting suggestions', error: error.message });
+  }
+};
+
+/**
+ * Gram Sabha Resolution Approval
+ * Required before claim can proceed to Field Verification
+ */
+exports.gramSabhaApprove = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { resolutionNumber, resolutionDate, quorumMet, frcMemberCount, documentUrl } = req.body;
+
+    if (!resolutionNumber || !resolutionDate) {
+      return res.status(400).json({ message: 'Resolution number and date are required' });
+    }
+
+    const claim = await Claim.findById(id);
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    // Can only update Submitted or Remanded claims
+    if (!['Submitted', 'Remanded'].includes(claim.status)) {
+      return res.status(400).json({
+        message: 'Gram Sabha approval only valid for Submitted or Remanded claims',
+        currentStatus: claim.status
+      });
+    }
+
+    // Update Gram Sabha Resolution
+    claim.gramSabhaResolution = {
+      date: new Date(resolutionDate),
+      resolutionNumber: resolutionNumber,
+      documentUrl: documentUrl || claim.gramSabhaResolution?.documentUrl,
+      quorumMet: quorumMet !== undefined ? quorumMet : true,
+      frcMemberCount: frcMemberCount || 0,
+      approvedBy: req.user.id
+    };
+
+    // Update status
+    claim.status = 'GramSabhaApproved';
+
+    // Add to audit trail
+    claim.statusHistory.push({
+      status: 'GramSabhaApproved',
+      changedBy: req.user.id,
+      changedAt: new Date(),
+      reason: `Gram Sabha Resolution ${resolutionNumber} dated ${resolutionDate}`
+    });
+
+    await claim.save();
+
+    res.json({
+      message: 'Gram Sabha resolution recorded',
+      claim,
+      nextStep: 'Claim is now ready for Joint Verification by Field Worker'
+    });
+  } catch (error) {
+    console.error('Gram Sabha approve error:', error);
+    res.status(500).json({ message: 'Error recording Gram Sabha resolution', error: error.message });
+  }
+};
+
+/**
+ * Joint Verification by Forest + Revenue Officials
+ * Both signatures required before SDLC scrutiny
+ */
+exports.jointVerify = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      forestOfficerName, forestOfficerDesignation, forestOfficerSignature,
+      revenueInspectorName, revenueInspectorDesignation, revenueInspectorSignature,
+      sitePhotoBase64, location, notes
+    } = req.body;
+
+    const claim = await Claim.findById(id);
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    // Must have Gram Sabha approval first
+    if (claim.status !== 'GramSabhaApproved') {
+      return res.status(400).json({
+        message: 'Gram Sabha approval required before Joint Verification',
+        currentStatus: claim.status
+      });
+    }
+
+    // Initialize verification report if not exists
+    if (!claim.verificationReport) {
+      claim.verificationReport = {};
+    }
+
+    // Update Forest Officer details
+    if (forestOfficerName) {
+      claim.verificationReport.forestOfficerName = forestOfficerName;
+      claim.verificationReport.forestOfficerDesignation = forestOfficerDesignation;
+      claim.verificationReport.forestOfficerSignature = forestOfficerSignature || false;
+      claim.verificationReport.forestOfficerId = req.user.id;
+    }
+
+    // Update Revenue Inspector details
+    if (revenueInspectorName) {
+      claim.verificationReport.revenueInspectorName = revenueInspectorName;
+      claim.verificationReport.revenueInspectorDesignation = revenueInspectorDesignation;
+      claim.verificationReport.revenueInspectorSignature = revenueInspectorSignature || false;
+      claim.verificationReport.revenueInspectorId = req.user.id;
+    }
+
+    // Update location and photo
+    if (location) {
+      claim.verificationReport.location = location;
+    }
+    claim.verificationReport.timestamp = new Date();
+    claim.verificationReport.fieldWorkerId = req.user.id;
+
+    // Handle site photo
+    if (sitePhotoBase64) {
+      const fs = require('fs');
+      const path = require('path');
+      const base64Data = sitePhotoBase64.replace(/^data:image\/\w+;base64,/, "");
+      const buffer = Buffer.from(base64Data, 'base64');
+      const fileName = `joint-verify-${id}-${Date.now()}.jpg`;
+      const uploadDir = path.join(__dirname, '../../uploads');
+      if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+      fs.writeFileSync(path.join(uploadDir, fileName), buffer);
+      claim.verificationReport.sitePhotoUrl = `/uploads/${fileName}`;
+
+      // Trigger Satark AI analysis
+      try {
+        const satarkTools = require('../ai/tools/satarkTools');
+        const analysisResult = await satarkTools.analyzeEvidence(buffer, null);
+        claim.verificationReport.aiAnalysis = analysisResult.analysis || 'Analysis pending';
+        claim.verificationReport.matchScore = analysisResult.matchScore || 0;
+        claim.verificationReport.satarkRecommendation =
+          analysisResult.matchScore > 70 ? 'Approve' :
+            analysisResult.matchScore > 40 ? 'NeedsReview' : 'Reject';
+      } catch (err) {
+        console.error('Satark analysis error:', err);
+        claim.verificationReport.aiAnalysis = 'AI analysis unavailable';
+      }
+    }
+
+    // Check if both signatures are present
+    const isComplete = claim.verificationReport.forestOfficerSignature &&
+      claim.verificationReport.revenueInspectorSignature;
+
+    if (isComplete) {
+      claim.status = 'FieldVerified';
+      claim.statusHistory.push({
+        status: 'FieldVerified',
+        changedBy: req.user.id,
+        changedAt: new Date(),
+        reason: 'Joint Verification completed by Forest and Revenue officials'
+      });
+    }
+
+    claim.verificationReport.syncStatus = 'Synced';
+    await claim.save();
+
+    res.json({
+      message: isComplete ? 'Joint Verification Complete' : 'Verification details saved (awaiting second signature)',
+      claim,
+      verificationComplete: isComplete,
+      nextStep: isComplete ? 'Claim ready for SDLC Scrutiny' : 'Awaiting second official signature'
+    });
+  } catch (error) {
+    console.error('Joint verify error:', error);
+    res.status(500).json({ message: 'Error in joint verification', error: error.message });
+  }
+};
+
+/**
+ * Move claim to SDLC Scrutiny
+ */
+exports.moveToSDLC = async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.id);
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    if (claim.status !== 'FieldVerified') {
+      return res.status(400).json({
+        message: 'Only FieldVerified claims can be moved to SDLC',
+        currentStatus: claim.status
+      });
+    }
+
+    // Check if joint verification is complete
+    if (!claim.isJointVerificationComplete || !claim.isJointVerificationComplete()) {
+      return res.status(400).json({
+        message: 'Joint Verification incomplete. Both Forest and Revenue signatures required.'
+      });
+    }
+
+    claim.status = 'SDLC_Scrutiny';
+    claim.statusHistory.push({
+      status: 'SDLC_Scrutiny',
+      changedBy: req.user.id,
+      changedAt: new Date(),
+      reason: 'Moved to SDLC for scrutiny'
+    });
+
+    await claim.save();
+    res.json({ message: 'Claim moved to SDLC Scrutiny', claim });
+  } catch (error) {
+    console.error('Move to SDLC error:', error);
+    res.status(500).json({ message: 'Error moving to SDLC', error: error.message });
+  }
+};
+
+/**
+ * Generate Title Deed (Form C) PDF
+ */
+exports.generateTitleDeed = async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.id).populate('claimant');
+    if (!claim) {
+      return res.status(404).json({ message: 'Claim not found' });
+    }
+
+    if (claim.status !== 'Approved') {
+      return res.status(400).json({
+        message: 'Title Deed can only be generated for Approved claims',
+        currentStatus: claim.status
+      });
+    }
+
+    const { generateTitleDeedPDF } = require('../services/pdfGenerator');
+    const pdfResult = await generateTitleDeedPDF(claim);
+
+    // Update claim with title deed info
+    claim.titleDeed = {
+      pdfUrl: pdfResult.pdfUrl,
+      generatedAt: new Date(),
+      generatedBy: req.user.id,
+      serialNumber: pdfResult.serialNumber
+    };
+    claim.status = 'Title_Issued';
+
+    claim.statusHistory.push({
+      status: 'Title_Issued',
+      changedBy: req.user.id,
+      changedAt: new Date(),
+      reason: `Title Deed ${pdfResult.serialNumber} generated`
+    });
+
+    await claim.save();
+
+    res.json({
+      message: 'Title Deed generated successfully',
+      pdfUrl: pdfResult.pdfUrl,
+      serialNumber: pdfResult.serialNumber,
+      claim
+    });
+  } catch (error) {
+    console.error('Generate title deed error:', error);
+    res.status(500).json({ message: 'Error generating title deed', error: error.message });
+  }
+};

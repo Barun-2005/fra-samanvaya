@@ -61,6 +61,24 @@ router.post('/:id/approve', requireAuth, claimController.approveClaim);
 router.post('/:id/reject', requireAuth, claimController.rejectClaim);
 router.get('/:id/risk', requireAuth, claimController.getClaimRisk);
 
+// ============================================
+// PHASE 5: STATUTORY COMPLIANCE ROUTES
+// ============================================
+
+// Gram Sabha Resolution (Form B)
+router.post('/:id/gram-sabha-approve', requireAuth, claimController.gramSabhaApprove);
+
+// Joint Verification (Forest + Revenue)
+router.post('/:id/joint-verify', requireAuth, claimController.jointVerify);
+
+// Move to SDLC Scrutiny
+router.post('/:id/move-to-sdlc', requireAuth, claimController.moveToSDLC);
+
+// Remand to Gram Sabha (SDLC duty)
+router.post('/:id/remand', requireAuth, claimController.remandClaim);
+router.get('/:id/remand-suggestions', requireAuth, claimController.getRemandSuggestion);
+
+// Generate Title Deed (Form C)
+router.post('/:id/generate-title-deed', requireAuth, claimController.generateTitleDeed);
+
 module.exports = router;
-
-

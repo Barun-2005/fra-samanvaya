@@ -95,6 +95,31 @@ The anomaly detector runs system-wide checks:
 - Officers can search for similar past cases based on claim description
 - Knowledge base stores FRA legal text for contextual answers
 
+### Statutory Compliance (FRA 2006)
+
+The platform enforces legal workflow requirements:
+
+| Feature | Description |
+|---------|-------------|
+| **Gram Sabha Resolution** | Record Form B resolution with quorum tracking before claim processing |
+| **Joint Verification** | Requires dual signatures from Forest and Revenue officials |
+| **Remand Workflow** | SDLC can remand claims back to Gram Sabha with AI-suggested reasons (Vidhi) |
+| **Status Transitions** | Enforced legal workflow prevents illegal status jumps |
+| **Form C Title Deed** | Auto-generates official Title Deed PDF per FRA Rules 2008 |
+
+### DA-JGUA Convergence Schemes
+
+When a claim reaches Title_Issued status, eligible welfare schemes are auto-recommended:
+
+- PMAY-G (Housing - ₹1.20 Lakh)
+- MGNREGA (Land Development - 100 days guaranteed)
+- Jal Jeevan Mission (Tap water connection)
+- Van Dhan Vikas Yojana (MFP value addition)
+- PM-KISAN (₹6,000/year income support)
+- Eklavya Schools (Residential education)
+- Ayushman Bharat (₹5 Lakh health coverage)
+- CFR Management Support (Community forest management)
+
 ---
 
 ## Technical Stack
@@ -143,10 +168,10 @@ fra-samanvaya/
 │   │   │   └── tools/             # Agent tool implementations
 │   │   ├── controllers/           # API endpoints
 │   │   ├── models/                # MongoDB schemas (8 models)
-│   │   ├── services/              # Business logic (11 services)
+│   │   ├── services/              # Business logic (12 services + pdfGenerator)
 │   │   ├── middlewares/           # Auth, validation
 │   │   └── routes/                # Route definitions
-│   └── scripts/                   # Database seeding
+│   └── scripts/                   # Database seeding (including DA-JGUA schemes)
 ├── frontend/
 │   ├── pages/
 │   │   ├── dashboard/             # 8 role-specific dashboards
@@ -155,7 +180,7 @@ fra-samanvaya/
 │   │   └── login.js               # Authentication
 │   └── src/
 │       ├── components/
-│       │   ├── Claims/            # 17 claim components
+│       │   ├── Claims/            # 21 claim components (including statutory forms)
 │       │   ├── Dashboard/         # Dashboard widgets
 │       │   ├── Atlas/             # GIS mapping
 │       │   └── Assistant/         # AI chat interface
