@@ -8,7 +8,8 @@
 
 const mongoose = require('mongoose');
 const Scheme = require('../src/models/Scheme');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
 const DA_JGUA_SCHEMES = [
     // Housing
