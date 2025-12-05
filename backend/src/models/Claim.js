@@ -35,6 +35,21 @@ const claimSchema = new mongoose.Schema({
   verifiedAt: { type: Date },
   verificationNotes: { type: String },
 
+  // Satark Verification Report (Offline Sync Support)
+  verificationReport: {
+    fieldWorkerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    sitePhotoUrl: { type: String },
+    satelliteSnapshotUrl: { type: String },
+    aiAnalysis: { type: String },
+    matchScore: { type: Number }, // 0-100
+    timestamp: { type: Date },
+    syncStatus: { type: String, enum: ['Pending', 'Synced'], default: 'Synced' },
+    location: {
+      lat: { type: Number },
+      lng: { type: Number }
+    }
+  },
+
   // Approval tracking  
   approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   approvedAt: { type: Date },
@@ -66,6 +81,13 @@ const claimSchema = new mongoose.Schema({
   // AI Insights
   veracityScore: { type: Number, default: 0 }, // 0-100
   eligibleSchemes: [{ type: String }], // List of scheme names
+
+  // Legal Workbench Drafts
+  draftOrder: {
+    english: { type: String },
+    vernacular: { type: String },
+    lastUpdated: { type: Date }
+  }
 });
 
 const Claim = mongoose.model('Claim', claimSchema);

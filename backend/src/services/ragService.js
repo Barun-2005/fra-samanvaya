@@ -172,9 +172,16 @@ const findSimilarClaims = async (claimText) => {
         } catch (err) {
             console.warn("Claim vector search failed. Falling back to basic find.", err.message);
             // Fallback: Basic text search if vector index is missing
-            similarClaims = await Claim.find({
-                reasonForClaim: { $regex: claimText.split(' ')[0], $options: 'i' }
-            }).limit(3);
+            // Ensure claimText is safe to split
+            const keyword = claimText ? claimText.split(' ')[0] : '';
+            if (keyword) {
+                similarClaims = await Claim.find({
+                    reasonForClaim: { $regex: keyword, $options: 'i' }
+                }).limit(3);
+            } else {
+                // If no text, just return recent approved claims as "similar" examples
+                similarClaims = await Claim.find({ status: 'Approved' }).limit(3);
+            }
         }
 
         return similarClaims;

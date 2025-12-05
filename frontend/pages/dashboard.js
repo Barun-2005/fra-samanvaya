@@ -33,6 +33,9 @@ export default function DashboardRouter() {
                 case 'Super Admin':
                     router.replace('/dashboard/super-admin');
                     break;
+                case 'Field Worker':
+                    router.replace('/dashboard/field-worker');
+                    break;
                 default:
                     // Fallback to citizen dashboard
                     router.replace('/dashboard/citizen');

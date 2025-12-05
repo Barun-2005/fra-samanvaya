@@ -167,7 +167,7 @@ exports.updateClaim = async (req, res) => {
     }
 
     // Apply updates
-    const allowedUpdates = ['claimantName', 'aadhaarNumber', 'village', 'landSizeClaimed', 'surveyNumber', 'claimType', 'reasonForClaim', 'remarks', 'geojson', 'boundaryArea'];
+    const allowedUpdates = ['claimantName', 'aadhaarNumber', 'village', 'landSizeClaimed', 'surveyNumber', 'claimType', 'reasonForClaim', 'remarks', 'geojson', 'boundaryArea', 'draftOrder'];
 
     allowedUpdates.forEach(field => {
       if (updates[field] !== undefined) {
@@ -200,18 +200,90 @@ exports.updateClaim = async (req, res) => {
   }
 };
 
-// Verify a claim (Verification Officer)
+// Verify a claim (Verification Officer or Field Worker via Satark)
 exports.verifyClaim = async (req, res) => {
   try {
     const { id } = req.params;
-    const { notes } = req.body;
+    const { notes, verificationReport } = req.body;
 
     const claim = await Claim.findById(id);
     if (!claim) {
       return res.status(404).json({ message: 'Claim not found' });
     }
 
-    if (claim.status !== 'Submitted') {
+    // If it's a Satark Field Report
+    if (verificationReport) {
+      const satarkTools = require('../ai/tools/satarkTools');
+      const fs = require('fs');
+      const path = require('path');
+
+      // 1. Save Photo
+      let sitePhotoUrl = '';
+      if (verificationReport.sitePhotoBase64) {
+        const base64Data = verificationReport.sitePhotoBase64.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, 'base64');
+        const fileName = `site-visit-${id}-${Date.now()}.jpg`;
+        const uploadDir = path.join(__dirname, '../../uploads'); // Ensure this exists
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+        fs.writeFileSync(path.join(uploadDir, fileName), buffer);
+        sitePhotoUrl = `/uploads/${fileName}`;
+      }
+
+      // 2. Trigger Satark Analysis
+      // We need a satellite photo URL. For now, we'll mock it or use a placeholder if not in claim.
+      // In a real app, we'd fetch it from Google Maps Static API using claim.boundaryArea or location.
+      const satellitePhotoUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" +
+        (verificationReport.location?.lat || 0) + "," + (verificationReport.location?.lng || 0) +
+        "&zoom=18&size=600x300&maptype=satellite&key=" + process.env.GOOGLE_MAPS_API_KEY;
+
+      let aiAnalysis = "Pending Analysis";
+      let matchScore = 0;
+
+      try {
+        // Pass buffer directly to Satark
+        const buffer = verificationReport.sitePhotoBase64 ? Buffer.from(verificationReport.sitePhotoBase64.replace(/^data:image\/\w+;base64,/, ""), 'base64') : null;
+        if (buffer) {
+          const analysisResult = await satarkTools.analyzeEvidence(buffer, satellitePhotoUrl);
+          aiAnalysis = analysisResult.analysis || "Analysis Failed";
+          matchScore = analysisResult.matchScore || 0;
+        }
+      } catch (err) {
+        console.error("Satark Analysis Error:", err);
+        aiAnalysis = "AI Analysis Failed: " + err.message;
+      }
+
+      // 3. Update Claim with Report
+      claim.verificationReport = {
+        fieldWorkerId: req.user.id,
+        sitePhotoUrl: sitePhotoUrl,
+        satelliteSnapshotUrl: satellitePhotoUrl,
+        aiAnalysis: aiAnalysis,
+        matchScore: matchScore,
+        timestamp: verificationReport.timestamp || new Date(),
+        syncStatus: 'Synced',
+        location: verificationReport.location
+      };
+
+      // Auto-update status if match score is high? Or just leave it for Verification Officer?
+      // Let's keep status as 'Submitted' or move to 'Under Verification' if not already.
+      // But the prompt says "Verify a claim".
+      // If this comes from Field Worker, maybe we don't mark as 'Verified' yet, just attach report.
+      // But the route is /verify.
+      // Let's add a note to history.
+      claim.statusHistory.push({
+        status: claim.status, // Keep current status
+        changedBy: req.user.id,
+        changedAt: new Date(),
+        reason: 'Field Verification Report Submitted'
+      });
+
+      await claim.save();
+      return res.json({ message: 'Field Report Synced & Analyzed', claim });
+    }
+
+    // Standard Verification Officer Flow (Manual Approval)
+    if (claim.status !== 'Submitted' && claim.status !== 'Under Verification') {
       return res.status(400).json({ message: 'Only submitted claims can be verified' });
     }
 

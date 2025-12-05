@@ -5,6 +5,8 @@ import api from '../../lib/api';
 import { MessageSquare, Send, X, Scale, FileText, Shield, Briefcase, Eye, Bot } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+import ReactMarkdown from 'react-markdown';
+
 export default function FraBot() {
     const { user } = useAuth();
     const router = useRouter();
@@ -51,6 +53,13 @@ export default function FraBot() {
             Icon: Eye,
             subtitle: 'Anomaly Detection & System Health'
         };
+        if (user?.roles.includes('Field Worker')) return {
+            greeting: 'Satark Online. I am ready to verify claims and analyze evidence.',
+            context: 'You are Satark, a Vigilance AI helping a Field Worker. Focus on geolocation, evidence analysis, and verification reports.',
+            title: 'Satark (Vigilance)',
+            Icon: Eye,
+            subtitle: 'Field Verification & Evidence Analysis'
+        };
         return {
             greeting: 'Namaste. I am the FRA Samanvay Assistant. I can help you understand the Forest Rights Act, check eligibility, or guide you through the claim process.',
             context: 'You are a helpful government assistant explaining the Forest Rights Act 2006 to a citizen. Keep answers simple, respectful, and clear. Do not use emojis.',
@@ -96,10 +105,16 @@ export default function FraBot() {
                 agentRole = 'data_entry';
             } else if (user?.roles.includes('NGO Member') || user?.roles.includes('ngo')) {
                 agentRole = 'ngo';
-            } else if (user?.roles.some(r => ['Verification Officer', 'Approving Authority', 'Scheme Admin', 'Super Admin'].includes(r))) {
-                agentRole = 'official'; // Vidhi
-            } else if (user?.roles.includes('Field Officer')) {
-                agentRole = 'field_officer'; // Satark
+            } else if (user?.roles.includes('Field Worker') || user?.roles.includes('Field Officer')) {
+                agentRole = 'field_worker'; // Satark
+            } else if (user?.roles.includes('Verification Officer')) {
+                agentRole = 'verification_officer'; // Satark
+            } else if (user?.roles.includes('Approving Authority')) {
+                agentRole = 'approving_authority'; // Vidhi
+            } else if (user?.roles.includes('Scheme Admin')) {
+                agentRole = 'scheme_admin'; // Vidhi
+            } else if (user?.roles.includes('Super Admin')) {
+                agentRole = 'super_admin'; // Satark (or Vidhi depending on preference, sticking to Satark for now)
             }
 
             // Use user ID as session ID if logged in, otherwise use a persistent random ID for this session
@@ -110,7 +125,12 @@ export default function FraBot() {
             const response = await api.post('/chat', {
                 message: input,
                 role: agentRole,
-                sessionId: sessionId
+                sessionId: sessionId,
+                userId: user?.id,
+                context: {
+                    claimId: router.query.id, // If on a claim detail page
+                    path: router.pathname
+                }
             });
 
             const botMessage = {
@@ -177,7 +197,11 @@ export default function FraBot() {
                                             : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-none shadow-sm border border-slate-200 dark:border-slate-700'
                                             }`}
                                     >
-                                        <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                                        <div className="text-sm prose dark:prose-invert max-w-none break-words">
+                                            <ReactMarkdown>
+                                                {message.text}
+                                            </ReactMarkdown>
+                                        </div>
                                         {message.sources && message.sources.length > 0 && (
                                             <div className="mt-2 pt-2 border-t border-slate-300 dark:border-slate-600">
                                                 <p className="text-xs opacity-75">

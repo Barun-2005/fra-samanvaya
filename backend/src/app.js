@@ -53,6 +53,8 @@ app.use('/api/schemes', schemeRoutes);
 app.use('/api/atlas', atlasRoutes);
 app.use('/api/knowledge-base', knowledgeBaseRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/chat', require('./routes/chat'));
+app.use('/api/vidhi', require('./routes/vidhi'));
 
 module.exports = app;

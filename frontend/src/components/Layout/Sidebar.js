@@ -28,6 +28,10 @@ export default function Sidebar() {
         'Super Admin': [
             { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
             { icon: FolderCheck, label: 'All Claims', href: '/claims' },
+        ],
+        'Field Worker': [
+            { icon: LayoutDashboard, label: 'Field Dashboard', href: '/dashboard' },
+            { icon: FolderCheck, label: 'My Tasks', href: '/claims' },
         ]
     };
 

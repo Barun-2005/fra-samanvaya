@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
         'Approving Authority',
         'Scheme Admin',
         'NGO Viewer',
+        'Field Worker',
         'Super Admin'
       ]
     }],

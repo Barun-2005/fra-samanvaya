@@ -74,13 +74,48 @@ async function lookupClaimStatusTool(claimId) {
                 claimantName: claim.claimantName,
                 village: claim.village,
                 dateSubmitted: claim.dateSubmitted,
-                details: `Your claim for ${claim.claimantName} in ${claim.village} is currently ${claim.status}.`
+                details: `Your claim for ${claim.claimantName} in ${claim.village} is currently ${claim.status}.`,
+                // Enhanced fields for Agents
+                claimType: claim.claimType,
+                reasonForClaim: claim.reasonForClaim,
+                landSizeClaimed: claim.landSizeClaimed,
+                documents: claim.documents?.map(d => d.type) || [],
+                veracityScore: claim.veracityScore,
+                assetSummary: claim.assetSummary
             });
         } else {
             return JSON.stringify({ error: `Claim with ID '${claimId}' not found. Please double-check the ID.` });
         }
     } catch (error) {
         return JSON.stringify({ error: `Database error: ${error.message}` });
+    }
+}
+
+// Tool 4.5: Get User Claims (Context Aware)
+async function getUserClaimsTool(userId) {
+    try {
+        const mongoose = require('mongoose');
+        const Claim = require('../../models/Claim');
+
+        if (!userId) return JSON.stringify({ error: "User ID not provided in context." });
+
+        const claims = await Claim.find({ claimant: userId }).select('status village district dateSubmitted claimType');
+
+        if (claims.length === 0) {
+            return JSON.stringify({ message: "No claims found for this user." });
+        }
+
+        return JSON.stringify({
+            count: claims.length,
+            claims: claims.map(c => ({
+                id: c._id,
+                status: c.status,
+                village: c.village,
+                submitted: c.dateSubmitted ? c.dateSubmitted.toISOString().split('T')[0] : 'N/A'
+            }))
+        });
+    } catch (error) {
+        return JSON.stringify({ error: error.message });
     }
 }
 
@@ -217,6 +252,8 @@ async function executeMitraTool(functionCall) {
             return await translateStatusTool(args.statusText, args.language);
         case 'lookup_claim_status':
             return await lookupClaimStatusTool(args.claimId);
+        case 'get_user_claims':
+            return await getUserClaimsTool(args.userId);
         case 'validate_claim':
             return await validateClaimDataTool(args);
         case 'get_stats':
@@ -226,10 +263,36 @@ async function executeMitraTool(functionCall) {
     }
 }
 
+const commonTools = [
+    {
+        name: "get_user_claims",
+        description: "Fetches all claims submitted by OR assigned to the current user. Use this when the user asks 'my claims', 'status of my application', or 'claims to verify'.",
+        parameters: {
+            type: "object",
+            properties: {
+                userId: { type: "string", description: "The ID of the user (injected by system)" }
+            },
+            required: ["userId"]
+        }
+    },
+    {
+        name: "lookup_claim_status",
+        description: "Checks the status of a specific claim ID.",
+        parameters: {
+            type: "object",
+            properties: {
+                claimId: { type: "string" }
+            },
+            required: ["claimId"]
+        }
+    }
+];
+
 module.exports = {
     citizenTools,
     dataEntryTools,
     ngoTools,
+    commonTools,
     executeMitraTool,
     extractClaimDataTool
 };
