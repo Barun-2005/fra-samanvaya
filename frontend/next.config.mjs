@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    // Disable ESLint during production builds
-    ignoreDuringBuilds: true,
-  },
   // The proxy is still needed to avoid CORS errors when your frontend
   // calls the backend API.
   async rewrites() {
