@@ -1,16 +1,23 @@
 # FRA Samanvay
 
-A digital platform for managing Forest Rights Act (FRA) 2006 claims in India, built for Smart India Hackathon 2025.
+**What it is:** A digital platform for processing Forest Rights Act (FRA) 2006 claims. Built for Smart India Hackathon 2025.
 
-**Live Demo:** [fra-samanvay.vercel.app](https://fra-samanvay.vercel.app)
+**What it does:** Takes forest rights claims from application to title deed - entirely online.
+
+**Live:** [fra-samanvay.vercel.app](https://fra-samanvay.vercel.app)
 
 ---
 
-## About
+## The Problem We're Solving
 
-FRA Samanvay digitizes the entire lifecycle of forest rights claims. The platform handles citizen applications, document verification, field worker visits, and final approval—all through role-specific interfaces backed by AI-powered analysis.
+The FRA 2006 gives millions of tribals and forest dwellers legal rights to the land they've lived on for generations. But the process is broken:
+- Data entry officers spend hours manually typing scanned documents
+- Field workers can't prove they actually visited the site
+- Verification officers have no way to cross-check evidence
+- Approving authorities draft orders manually from scratch
+- Citizens have no idea where their claim is stuck
 
-The system was built to address real bottlenecks in the FRA process: manual data entry, inconsistent verification, delayed approvals, and lack of transparency.
+We built this to fix all of that - with AI doing the heavy lifting.
 
 ---
 
@@ -125,29 +132,36 @@ When a claim reaches Title_Issued status, eligible welfare schemes are auto-reco
 ## Technical Stack
 
 ### Frontend
-- Next.js 15 with React 19
-- TailwindCSS
-- Leaflet for maps
-- React-hot-toast for notifications
+- Next.js 16 (TurbopackHell yeah - fresh off the security patch)
+- React 19
+- TailwindCSS 4
+- Leaflet for interactive maps
+- Lucide React icons
 
 ### Backend
 - Node.js with Express
-- MongoDB Atlas (with Vector Search)
-- JWT authentication with role-based access
-- 11 specialized services:
-  - `documentProcessor.js` - OCR pipeline
-  - `ragService.js` - Vector search and knowledge base
-  - `riskEngine.js` - Claim risk scoring
+- MongoDB Atlas with Vector Search (768-dim embeddings)
+- JWT auth + refresh tokens
+- **14 specialized services:**
+  - `documentProcessor.js` - 3-tier OCR pipeline (Sharp + SHA-256 + Gemini)
+  - `ragService.js` - Vector search with text-embedding-004
+  - `riskEngine.js` - Hybrid rule-based + AI risk scoring
   - `conflictDetector.js` - Geospatial overlap detection
   - `anomalyDetector.js` - Fraud pattern detection
-  - `policyMatcher.js` - Scheme eligibility matching
+  - `policyMatcher.js` - DA-JGUA scheme eligibility matching
+  - **`pdfGenerator.js`** - Puppeteer PDF for Form C Title Deeds (NEW)
+  - **`notificationService.js`** - Email + SMS for status updates (NEW)
+  - `satarkTools.js` - **Turf.js geometric verification** (UPGRADED)
   - `geminiOCR.js`, `geminiAtlas.js`, `geminiDSS.js`, `geminiAsset.js` - AI integrations
 
-### AI Models
-- Gemini 2.5 Flash (OCR, chat)
-- Gemini 2.0 Flash (vision)
-- Gemini 2.5 Pro (legal drafting)
-- text-embedding-004 (vector embeddings)
+### AI Models & Libraries
+- Gemini 2.5 Flash - Fast OCR and citizen chat
+- Gemini 2.0 Flash Vision - Site photo vs satellite comparison
+- Gemini 2.5 Pro - Legal drafting and reasoning
+- text-embedding-004 - Semantic embeddings (768 dimensions)
+- **@turf/turf** - Precise geospatial calculations
+- **Puppeteer** - Headless Chrome for PDF generation
+- **Nodemailer** - Email notifications
 
 ### Deployment
 - Frontend: Vercel
