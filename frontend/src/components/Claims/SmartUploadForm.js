@@ -87,26 +87,39 @@ export default function SmartUploadForm({ onDataExtracted }) {
                 },
             });
 
-            const { extractedData } = response.data;
+            const { extractedData, fieldsNeedingReview, overallConfidence } = response.data;
 
             if (extractedData) {
                 setScannedData(extractedData);
 
+                // Helper to extract value from new format (handles both old string format and new {value, confidence} format)
+                const getValue = (field) => {
+                    if (!field) return '';
+                    if (typeof field === 'string') return field;
+                    if (typeof field === 'object' && field.value !== undefined) return field.value;
+                    return '';
+                };
+
                 // Merge extracted data with form state
                 setFormData(prev => ({
                     ...prev,
-                    claimantName: extractedData.claimantName || prev.claimantName,
-                    aadhaarNumber: extractedData.aadhaarNumber || prev.aadhaarNumber,
-                    village: extractedData.village || prev.village,
-                    landSizeClaimed: extractedData.landSizeClaimed?.toString() || prev.landSizeClaimed,
-                    surveyNumber: extractedData.surveyNumber || prev.surveyNumber,
-                    claimType: extractedData.claimType || prev.claimType,
-                    // Keep existing reason/remarks if user typed them, otherwise use extracted if any
-                    reasonForClaim: prev.reasonForClaim || extractedData.reasonForClaim || '',
-                    remarks: prev.remarks || extractedData.remarks || ''
+                    claimantName: getValue(extractedData.claimantName) || prev.claimantName,
+                    aadhaarNumber: getValue(extractedData.aadhaarNumber) || prev.aadhaarNumber,
+                    village: getValue(extractedData.village) || prev.village,
+                    district: getValue(extractedData.district) || prev.district,
+                    landSizeClaimed: getValue(extractedData.landArea?.value?.amount || extractedData.landArea)?.toString() || prev.landSizeClaimed,
+                    surveyNumber: getValue(extractedData.surveyNumber) || prev.surveyNumber,
+                    claimType: getValue(extractedData.claimType) || prev.claimType,
+                    reasonForClaim: prev.reasonForClaim || getValue(extractedData.reasonForClaim) || '',
+                    remarks: prev.remarks || getValue(extractedData.remarks) || ''
                 }));
 
-                toast.success('Document analyzed successfully!', { id: toastId });
+                // Show fields needing review if any
+                if (fieldsNeedingReview && fieldsNeedingReview.length > 0) {
+                    toast.success(`Document analyzed! Please review: ${fieldsNeedingReview.join(', ')}`, { id: toastId, duration: 5000 });
+                } else {
+                    toast.success(`Document analyzed! Confidence: ${Math.round((overallConfidence || 0.8) * 100)}%`, { id: toastId });
+                }
             } else {
                 throw new Error('No data extracted');
             }
@@ -118,6 +131,7 @@ export default function SmartUploadForm({ onDataExtracted }) {
             setScanning(false);
         }
     };
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -185,8 +199,8 @@ export default function SmartUploadForm({ onDataExtracted }) {
 
                 <div
                     className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${dragActive
-                            ? 'border-primary bg-primary/5'
-                            : 'border-border-light dark:border-border-dark hover:border-primary/50'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border-light dark:border-border-dark hover:border-primary/50'
                         }`}
                     onDragEnter={handleDrag}
                     onDragLeave={handleDrag}
@@ -385,8 +399,8 @@ export default function SmartUploadForm({ onDataExtracted }) {
                                 type="button"
                                 onClick={() => startListening('reasonForClaim')}
                                 className={`absolute right-3 top-3 p-2 rounded-full transition-all ${activeField === 'reasonForClaim'
-                                        ? 'bg-red-100 text-red-600 animate-pulse'
-                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                    ? 'bg-red-100 text-red-600 animate-pulse'
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                                     }`}
                                 title="Voice Input"
                             >
@@ -414,8 +428,8 @@ export default function SmartUploadForm({ onDataExtracted }) {
                                 type="button"
                                 onClick={() => startListening('remarks')}
                                 className={`absolute right-3 top-3 p-2 rounded-full transition-all ${activeField === 'remarks'
-                                        ? 'bg-red-100 text-red-600 animate-pulse'
-                                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                                    ? 'bg-red-100 text-red-600 animate-pulse'
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
                                     }`}
                                 title="Voice Input"
                             >
