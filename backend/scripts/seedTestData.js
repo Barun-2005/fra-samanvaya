@@ -36,19 +36,20 @@ const SAMPLE_POLYGONS = {
     }
 };
 
-// Test users for all roles
+// Test users for all roles - matching User model schema
 const TEST_USERS = [
-    { username: 'citizen1', name: 'Ramesh Kumar Munda', email: 'ramesh@test.com', password: 'password123', role: 'Citizen', district: 'Sundargarh' },
-    { username: 'citizen2', name: 'Lakshmi Devi Oram', email: 'lakshmi@test.com', password: 'password123', role: 'Citizen', district: 'Koraput' },
-    { username: 'data_entry', name: 'Sunil Data Officer', email: 'dataentry@test.com', password: 'password123', role: 'Data Entry', district: 'Sundargarh' },
-    { username: 'field_worker', name: 'Mohan Field Worker', email: 'field@test.com', password: 'password123', role: 'Field Worker', district: 'Sundargarh' },
-    { username: 'verification_officer', name: 'Priya Verification', email: 'verify@test.com', password: 'password123', role: 'Verification Officer', district: 'Sundargarh' },
-    { username: 'approving_authority', name: 'Collector DLC', email: 'dlc@test.com', password: 'password123', role: 'Approving Authority', district: 'Sundargarh' },
-    { username: 'scheme_admin', name: 'Scheme Manager', email: 'scheme@test.com', password: 'password123', role: 'Scheme Admin', district: 'Sundargarh' },
-    { username: 'ngo_viewer', name: 'NGO Transparency', email: 'ngo@test.com', password: 'password123', role: 'NGO Viewer', district: 'Sundargarh' },
-    { username: 'super_admin', name: 'System Admin', email: 'admin@test.com', password: 'password123', role: 'Super Admin', district: 'All' },
-    { username: 'secretary', name: 'Village Secretary', email: 'secretary@test.com', password: 'password123', role: 'Secretary', district: 'Sundargarh' }
+    { username: 'citizen1', fullName: 'Ramesh Kumar Munda', email: 'ramesh@test.com', password: 'password123', roles: ['Citizen'], district: 'Sundargarh', employeeId: 'CIT001' },
+    { username: 'citizen2', fullName: 'Lakshmi Devi Oram', email: 'lakshmi@test.com', password: 'password123', roles: ['Citizen'], district: 'Koraput', employeeId: 'CIT002' },
+    { username: 'data_entry', fullName: 'Sunil Data Officer', email: 'dataentry@test.com', password: 'password123', roles: ['Data Entry Officer'], district: 'Sundargarh', employeeId: 'DEO001' },
+    { username: 'field_worker', fullName: 'Mohan Field Worker', email: 'field@test.com', password: 'password123', roles: ['Field Worker'], district: 'Sundargarh', employeeId: 'FW001' },
+    { username: 'verification_officer', fullName: 'Priya Verification', email: 'verify@test.com', password: 'password123', roles: ['Verification Officer'], district: 'Sundargarh', employeeId: 'VO001' },
+    { username: 'approving_authority', fullName: 'Collector DLC', email: 'dlc@test.com', password: 'password123', roles: ['Approving Authority'], district: 'Sundargarh', employeeId: 'DLC001' },
+    { username: 'scheme_admin', fullName: 'Scheme Manager', email: 'scheme@test.com', password: 'password123', roles: ['Scheme Admin'], district: 'Sundargarh', employeeId: 'SA001' },
+    { username: 'ngo_viewer', fullName: 'NGO Transparency', email: 'ngo@test.com', password: 'password123', roles: ['NGO Viewer'], district: 'Sundargarh', employeeId: 'NGO001' },
+    { username: 'super_admin', fullName: 'System Admin', email: 'admin@test.com', password: 'password123', roles: ['Super Admin'], district: 'All', employeeId: 'ADMIN001' },
+    { username: 'secretary', fullName: 'Village Secretary', email: 'secretary@test.com', password: 'password123', roles: ['Data Entry Officer'], district: 'Sundargarh', employeeId: 'SEC001' }
 ];
+
 
 // Claims at different statuses for testing workflows
 const generateTestClaims = (users) => {
