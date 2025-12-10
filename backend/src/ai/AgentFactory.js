@@ -336,55 +336,149 @@ class VidhiAgent {
         this.tools = [...vidhiToolDefinitions, ...commonTools];
     }
 
+    /**
+     * SELF-CORRECTION ENABLED CHAT
+     * Vidhi evaluates its own responses and retries if confidence is low
+     */
     async chat(userMessage) {
         const history = await this.getHistory();
+        const MAX_ATTEMPTS = 3;
+        const CONFIDENCE_THRESHOLD = 70;
 
-        const model = genAI.getGenerativeModel({
-            model: this.modelName,
-            systemInstruction: this.systemInstruction,
-            tools: [{ functionDeclarations: this.tools }]
-        });
+        let attempt = 0;
+        let finalResponse = null;
+        let refinementContext = '';
 
-        const chat = model.startChat({ history: history });
-        let result = await chat.sendMessage(userMessage);
+        while (attempt < MAX_ATTEMPTS) {
+            attempt++;
+            console.log(`[Vidhi] Attempt ${attempt}/${MAX_ATTEMPTS}`);
 
-        // Handle Tool Calls
-        const functionCalls = result.response.functionCalls();
-        if (functionCalls && functionCalls.length > 0) {
-            const functionCall = functionCalls[0];
-            console.log(`[Vidhi] Calling function: ${functionCall.name}`);
+            const model = genAI.getGenerativeModel({
+                model: this.modelName,
+                systemInstruction: this.systemInstruction,
+                tools: [{ functionDeclarations: this.tools }]
+            });
 
-            // Inject context
-            if (functionCall.name === 'draft_order' && !functionCall.args.claimId && this.context.claimId) {
-                functionCall.args.claimId = this.context.claimId;
-            }
-            if (functionCall.name === 'get_user_claims' && !functionCall.args.userId && this.context.userId) {
-                functionCall.args.userId = this.context.userId;
-            }
+            const chat = model.startChat({ history: history });
 
-            let functionResult;
-            // Route to correct executor
-            if (['search_precedents', 'fetch_laws', 'draft_order'].includes(functionCall.name)) {
-                functionResult = await executeVidhiTool(functionCall);
-            } else {
-                functionResult = await executeMitraTool(functionCall);
-            }
+            // Include refinement context if this is a retry
+            const enhancedMessage = refinementContext
+                ? `${userMessage}\n\n[REFINEMENT NEEDED: ${refinementContext}]`
+                : userMessage;
 
-            result = await chat.sendMessage([{
-                functionResponse: {
-                    name: functionCall.name,
-                    response: { result: functionResult }
+            let result = await chat.sendMessage(enhancedMessage);
+
+            // Handle Tool Calls
+            const functionCalls = result.response.functionCalls();
+            if (functionCalls && functionCalls.length > 0) {
+                const functionCall = functionCalls[0];
+                console.log(`[Vidhi] Calling function: ${functionCall.name}`);
+
+                // Inject context
+                if (functionCall.name === 'draft_order' && !functionCall.args.claimId && this.context.claimId) {
+                    functionCall.args.claimId = this.context.claimId;
                 }
-            }]);
-        }
+                if (functionCall.name === 'get_user_claims' && !functionCall.args.userId && this.context.userId) {
+                    functionCall.args.userId = this.context.userId;
+                }
 
-        const finalResponse = result.response.text();
+                let functionResult;
+                // Route to correct executor
+                if (['search_precedents', 'fetch_laws', 'draft_order'].includes(functionCall.name)) {
+                    functionResult = await executeVidhiTool(functionCall);
+                } else {
+                    functionResult = await executeMitraTool(functionCall);
+                }
+
+                result = await chat.sendMessage([{
+                    functionResponse: {
+                        name: functionCall.name,
+                        response: { result: functionResult }
+                    }
+                }]);
+            }
+
+            const response = result.response.text();
+
+            // SELF-EVALUATION: Vidhi rates its own response
+            const evaluationResult = await this.evaluateResponse(userMessage, response);
+
+            console.log(`[Vidhi] Self-evaluation: confidence=${evaluationResult.confidence}, issues=${evaluationResult.issues?.length || 0}`);
+
+            if (evaluationResult.confidence >= CONFIDENCE_THRESHOLD) {
+                // Response is good enough
+                finalResponse = response;
+
+                // Add confidence badge if high confidence
+                if (evaluationResult.confidence >= 90) {
+                    finalResponse += `\n\n---\n*Vidhi Confidence: ${evaluationResult.confidence}% (High)*`;
+                }
+                break;
+            } else if (attempt < MAX_ATTEMPTS) {
+                // Need to retry with refinement
+                refinementContext = evaluationResult.issues?.join('; ') || 'Please provide a more complete and accurate response.';
+                console.log(`[Vidhi] Retrying due to low confidence. Issues: ${refinementContext}`);
+            } else {
+                // Max attempts reached, use last response with disclaimer
+                finalResponse = response;
+                finalResponse += `\n\n---\n*Note: This response may require verification. Vidhi confidence: ${evaluationResult.confidence}%*`;
+            }
+        }
 
         await this.saveMessage('user', userMessage);
         await this.saveMessage('model', finalResponse);
 
         return finalResponse;
     }
+
+    /**
+     * Vidhi evaluates its own response for quality and completeness
+     */
+    async evaluateResponse(question, response) {
+        try {
+            const evalModel = genAI.getGenerativeModel({
+                model: this.modelName,
+                generationConfig: {
+                    temperature: 0,
+                    responseMimeType: "application/json"
+                }
+            });
+
+            const evalPrompt = `
+You are a Legal Quality Assurance AI. Evaluate the following legal response for accuracy and completeness.
+
+ORIGINAL QUESTION:
+${question}
+
+RESPONSE TO EVALUATE:
+${response}
+
+Evaluate based on these criteria:
+1. COMPLETENESS: Does it fully answer the question?
+2. LEGAL ACCURACY: Are FRA sections cited correctly?
+3. PRECEDENT USAGE: Are similar cases referenced?
+4. ACTIONABILITY: Does it provide clear next steps?
+5. FORMALITY: Is the tone appropriate for legal advice?
+
+Return JSON:
+{
+  "confidence": 0-100,
+  "issues": ["Issue 1", "Issue 2"],
+  "strengths": ["Strength 1"],
+  "suggestion": "How to improve if confidence < 70"
+}
+`;
+
+            const result = await evalModel.generateContent(evalPrompt);
+            const text = result.response.text();
+            return JSON.parse(text);
+        } catch (error) {
+            console.error('[Vidhi] Self-evaluation failed:', error.message);
+            // Default to passing if evaluation fails
+            return { confidence: 75, issues: [], strengths: ['Evaluation skipped'] };
+        }
+    }
+
 
     async getHistory() {
         const messages = await Message.find({ sessionId: this.sessionId })

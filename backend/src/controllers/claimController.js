@@ -1,5 +1,6 @@
 const Claim = require('../models/Claim');
 const { validateClaimSubmission } = require('../services/conflictDetector');
+const { sendStatusUpdate, notifyOfficerNewClaim } = require('../services/notificationService');
 
 // Get aggregated statistics for claims
 exports.getClaimStats = async (req, res) => {
@@ -303,6 +304,9 @@ exports.verifyClaim = async (req, res) => {
 
     await claim.save();
 
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'Verified');
+
     res.json({ message: 'Claim verified successfully', claim });
   } catch (error) {
     console.error('Verify claim error:', error);
@@ -341,6 +345,9 @@ exports.approveClaim = async (req, res) => {
 
     await claim.save();
 
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'Approved');
+
     res.json({ message: 'Claim approved successfully', claim });
   } catch (error) {
     console.error('Approve claim error:', error);
@@ -376,6 +383,9 @@ exports.rejectClaim = async (req, res) => {
     });
 
     await claim.save();
+
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'Rejected');
 
     res.json({ message: 'Claim rejected', claim });
   } catch (error) {
@@ -498,7 +508,8 @@ exports.remandClaim = async (req, res) => {
 
     await claim.save();
 
-    // TODO: Trigger notification to Gram Sabha
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'Remanded');
 
     res.json({
       message: 'Claim remanded to Gram Sabha',
@@ -611,6 +622,9 @@ exports.gramSabhaApprove = async (req, res) => {
     });
 
     await claim.save();
+
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'GramSabhaApproved');
 
     res.json({
       message: 'Gram Sabha resolution recorded',
@@ -810,6 +824,9 @@ exports.generateTitleDeed = async (req, res) => {
     });
 
     await claim.save();
+
+    // Send notification to claimant
+    await sendStatusUpdate(claim.claimant, claim._id, 'Title_Issued');
 
     res.json({
       message: 'Title Deed generated successfully',

@@ -192,8 +192,195 @@ const findSimilarClaims = async (claimText) => {
     }
 };
 
+/**
+ * HYBRID SEARCH (RAG 2.0) - Combines Vector + Keyword Search with RRF
+ * Better retrieval for queries that benefit from both semantic and exact matching
+ * 
+ * @param {string} query - User's search query
+ * @param {number} topK - Number of results to return
+ * @param {string} roleContext - Context for the AI response
+ * @returns {Promise<Object>} - Answer with sources and fusion scores
+ */
+const hybridSearch = async (query, topK = 5, roleContext = "You are Vidhi, a legal AI assistant for the Forest Rights Act.") => {
+    try {
+        console.log(`[Hybrid Search] Query: "${query.substring(0, 50)}..."`);
+
+        // 1. VECTOR SEARCH (Semantic)
+        let vectorResults = [];
+        try {
+            const queryEmbedding = await generateEmbedding(query);
+            vectorResults = await KnowledgeBase.aggregate([
+                {
+                    "$vectorSearch": {
+                        "index": "vector_index",
+                        "path": "embedding",
+                        "queryVector": queryEmbedding,
+                        "numCandidates": 100,
+                        "limit": topK * 2
+                    }
+                },
+                {
+                    "$project": {
+                        "_id": 1,
+                        "content": 1,
+                        "source": 1,
+                        "title": 1,
+                        "category": 1,
+                        "vectorScore": { "$meta": "vectorSearchScore" }
+                    }
+                }
+            ]);
+            console.log(`[Hybrid Search] Vector results: ${vectorResults.length}`);
+        } catch (err) {
+            console.warn("[Hybrid Search] Vector search failed:", err.message);
+        }
+
+        // 2. KEYWORD SEARCH (BM25-like using MongoDB text index)
+        let keywordResults = [];
+        try {
+            // Try text search first (requires text index)
+            keywordResults = await KnowledgeBase.find(
+                { $text: { $search: query } },
+                { score: { $meta: "textScore" }, content: 1, source: 1, title: 1, category: 1 }
+            ).sort({ score: { $meta: "textScore" } }).limit(topK * 2);
+            console.log(`[Hybrid Search] Keyword (text) results: ${keywordResults.length}`);
+        } catch (err) {
+            // Fallback to regex search if no text index
+            console.warn("[Hybrid Search] Text search failed, using regex fallback");
+            const keywords = query.split(' ').filter(w => w.length > 3).slice(0, 5);
+            const regexPattern = keywords.join('|');
+            if (regexPattern) {
+                keywordResults = await KnowledgeBase.find({
+                    content: { $regex: regexPattern, $options: 'i' }
+                }).limit(topK * 2);
+            }
+            console.log(`[Hybrid Search] Keyword (regex) results: ${keywordResults.length}`);
+        }
+
+        // 3. RECIPROCAL RANK FUSION (RRF)
+        // RRF formula: score = Σ(1 / (k + rank)) where k is typically 60
+        const k = 60; // Standard RRF constant
+        const fusedScores = new Map();
+        const docContent = new Map();
+
+        // Score from vector results
+        vectorResults.forEach((doc, idx) => {
+            const id = doc._id.toString();
+            fusedScores.set(id, (fusedScores.get(id) || 0) + (1 / (k + idx + 1)));
+            docContent.set(id, {
+                content: doc.content,
+                source: doc.source,
+                title: doc.title,
+                category: doc.category,
+                vectorScore: doc.vectorScore
+            });
+        });
+
+        // Score from keyword results
+        keywordResults.forEach((doc, idx) => {
+            const id = doc._id.toString();
+            fusedScores.set(id, (fusedScores.get(id) || 0) + (1 / (k + idx + 1)));
+            if (!docContent.has(id)) {
+                docContent.set(id, {
+                    content: doc.content,
+                    source: doc.source,
+                    title: doc.title,
+                    category: doc.category,
+                    keywordScore: doc.score
+                });
+            } else {
+                docContent.get(id).keywordScore = doc.score;
+            }
+        });
+
+        // Sort by fused score and take top K
+        const rankedResults = Array.from(fusedScores.entries())
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, topK)
+            .map(([id, fusedScore]) => ({
+                ...docContent.get(id),
+                fusedScore,
+                id
+            }));
+
+        console.log(`[Hybrid Search] After RRF: ${rankedResults.length} unique results`);
+
+        // 4. GENERATE ANSWER with fused context
+        const contextText = rankedResults
+            .map((doc, idx) => `[${idx + 1}. Source: ${doc.source || 'FRA Document'}]\n${doc.content}`)
+            .join('\n\n---\n\n');
+
+        const prompt = `
+${roleContext}
+
+You are using HYBRID SEARCH (vector + keyword fusion) to answer this question.
+The following excerpts are ranked by relevance using Reciprocal Rank Fusion.
+
+Context:
+${contextText}
+
+User Question: ${query}
+
+Instructions:
+1. Answer using ONLY the context provided
+2. Cite sources using [1], [2], etc. format
+3. If the answer isn't in the context, clearly state that
+4. Be precise and concise
+`;
+
+        const result = await chatModel.generateContent(prompt);
+        const answer = result.response.text();
+
+        return {
+            answer,
+            sources: rankedResults.map(d => ({
+                source: d.source,
+                title: d.title,
+                category: d.category,
+                fusedScore: d.fusedScore?.toFixed(4),
+                vectorScore: d.vectorScore?.toFixed(4),
+                keywordScore: d.keywordScore?.toFixed(2)
+            })),
+            searchStats: {
+                vectorResults: vectorResults.length,
+                keywordResults: keywordResults.length,
+                fusedResults: rankedResults.length,
+                method: 'Hybrid (Vector + Keyword + RRF)'
+            }
+        };
+
+    } catch (error) {
+        console.error("Hybrid search error:", error);
+        throw error;
+    }
+};
+
+/**
+ * Create text index for hybrid search (run once)
+ * Call this from a setup script if needed
+ */
+const createTextIndex = async () => {
+    try {
+        await KnowledgeBase.collection.createIndex(
+            { content: "text", title: "text" },
+            { name: "kb_text_index", weights: { title: 10, content: 1 } }
+        );
+        console.log("Text index created successfully");
+        return true;
+    } catch (error) {
+        if (error.code === 85 || error.code === 86) {
+            console.log("Text index already exists");
+            return true;
+        }
+        throw error;
+    }
+};
+
 module.exports = {
+    generateEmbedding,
     ingestDocument,
     queryKnowledgeBase,
-    findSimilarClaims
+    findSimilarClaims,
+    hybridSearch,
+    createTextIndex
 };
