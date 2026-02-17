@@ -14,7 +14,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 async function recommendSchemes(claimantData, assetData) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
         const prompt = `
 You are an expert in Indian government welfare schemes for rural communities.

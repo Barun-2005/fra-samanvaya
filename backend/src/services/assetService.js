@@ -16,7 +16,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 async function analyzeSatelliteImage(imageBuffer, mimeType, userClaim, claimedArea = 1.0) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
         const prompt = `
 You are a satellite imagery analyst for the Forest Rights Act (FRA) in India.
@@ -106,7 +106,7 @@ Total percentages in landCover should sum to approximately 100.
  */
 async function analyzeByCoordinates(polygon, bbox, userClaim, claimedArea) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
         const area = claimedArea || calculatePolygonArea(polygon);
 

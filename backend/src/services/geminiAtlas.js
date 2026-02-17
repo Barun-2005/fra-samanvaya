@@ -3,10 +3,10 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function analyzeRegion(geojson, totalClaims, claimStats) {
-    try {
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
-        const prompt = `
+    const prompt = `
       Analyze the following region data for a Forest Rights Act (FRA) implementation project in India.
       
       Region Geometry (GeoJSON): ${JSON.stringify(geojson)}
@@ -41,31 +41,31 @@ async function analyzeRegion(geojson, totalClaims, claimStats) {
       }
     `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-        // Extract JSON from markdown code block if present
-        const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
+    // Extract JSON from markdown code block if present
+    const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
 
-        if (!jsonMatch) {
-            throw new Error('Invalid JSON response from Gemini');
-        }
-
-        const jsonString = jsonMatch[1] ? jsonMatch[1] : jsonMatch[0];
-        return JSON.parse(jsonString);
-
-    } catch (error) {
-        console.error('Gemini Atlas Analysis Error:', error);
-        // Fallback for demo if API fails
-        return {
-            landCover: { forestPercentage: 50, farmlandPercentage: 30, waterPercentage: 10, habitationPercentage: 10 },
-            analysis: "Automated analysis failed. Showing estimated data.",
-            schemes: [{ name: "MGNREGA", reason: "General rural employment" }],
-            transparencyScore: 50,
-            recommendations: ["Verify API connection"]
-        };
+    if (!jsonMatch) {
+      throw new Error('Invalid JSON response from Gemini');
     }
+
+    const jsonString = jsonMatch[1] ? jsonMatch[1] : jsonMatch[0];
+    return JSON.parse(jsonString);
+
+  } catch (error) {
+    console.error('Gemini Atlas Analysis Error:', error);
+    // Fallback for demo if API fails
+    return {
+      landCover: { forestPercentage: 50, farmlandPercentage: 30, waterPercentage: 10, habitationPercentage: 10 },
+      analysis: "Automated analysis failed. Showing estimated data.",
+      schemes: [{ name: "MGNREGA", reason: "General rural employment" }],
+      transparencyScore: 50,
+      recommendations: ["Verify API connection"]
+    };
+  }
 }
 
 module.exports = { analyzeRegion };

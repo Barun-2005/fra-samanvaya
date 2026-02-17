@@ -447,7 +447,7 @@ async function generateTitleDeedPDF(claim) {
 async function generateVernacularTitleDeed(claim, language = 'hi') {
     const { GoogleGenerativeAI } = require('@google/generative-ai');
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
     const langNames = { hi: 'Hindi', or: 'Odia', bn: 'Bengali', te: 'Telugu', mr: 'Marathi' };
 

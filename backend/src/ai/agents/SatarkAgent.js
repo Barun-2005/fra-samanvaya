@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const SatarkAgent = {
     role: "satark",
-    model: "gemini-2.0-flash-exp", // Vision capable
+    model: "gemini-2.5-flash-lite", // Vision capable
 
     systemInstruction: `
     You are SATARK (The Vigilance Engine).

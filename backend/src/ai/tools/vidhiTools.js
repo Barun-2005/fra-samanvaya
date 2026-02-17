@@ -56,7 +56,7 @@ const vidhiTools = {
             const claim = await Claim.findById(claimId).populate('claimant');
             if (!claim) throw new Error("Claim not found");
 
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
             const prompt = `
         You are Vidhi, the Governance AI.

@@ -43,3 +43,20 @@ backend/uploads/*
 !backend/uploads/sample_aadhar.jpg
 !backend/uploads/sample_land.pdf
 !backend/uploads/.gitkeep
+
+# Log and debug files
+*.log
+backend/crash.log
+backend/debug_login.log
+backend/error.log
+backend/error.txt
+backend/ocr_error.log
+backend/startup_debug.log
+backend/startup_error.txt
+backend/logs/
+
+# Internal planning docs (not for public repo)
+blueprint.md
+roadmap.md
+main.py
+LOCAL_SETUP.md

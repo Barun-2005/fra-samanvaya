@@ -47,7 +47,7 @@ async function extractSmartData(buffer, mimeType) {
     const base64Image = buffer.toString('base64');
 
     const model = genAI.getGenerativeModel({
-        model: process.env.GEMINI_MODEL_FAST || "gemini-2.5-flash",
+        model: process.env.GEMINI_MODEL_FAST || "gemini-2.5-flash-lite",
         generationConfig: {
             temperature: 0,
             responseMimeType: "application/json"

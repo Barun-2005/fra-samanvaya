@@ -14,7 +14,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
  */
 async function analyzeLandAssets(polygon, bbox) {
     try {
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-pro' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-lite' });
 
         // Calculate area in hectares (rough approximation)
         const area = calculatePolygonArea(polygon);

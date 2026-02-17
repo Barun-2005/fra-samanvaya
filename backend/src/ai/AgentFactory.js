@@ -11,9 +11,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 class AgentFactory {
     constructor() {
         this.models = {
-            fast: 'gemini-2.5-flash',
-            smart: 'gemini-2.5-flash', // Temporarily using flash for Vidhi to ensure stability
-            vision: 'gemini-2.0-flash-exp' // Satark needs vision
+            fast: 'gemini-2.5-flash-lite',
+            smart: 'gemini-2.5-flash-lite',
+            vision: 'gemini-2.5-flash-lite'
         };
     }
 

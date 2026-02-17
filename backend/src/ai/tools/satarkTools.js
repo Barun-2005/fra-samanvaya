@@ -12,7 +12,7 @@ const satarkTools = {
      */
     analyzeEvidence: async (sitePhotoBuffer, satellitePhotoUrl) => {
         try {
-            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
             // Convert buffer to base64 for Gemini
             const sitePhotoBase64 = sitePhotoBuffer.toString('base64');

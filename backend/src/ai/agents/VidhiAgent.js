@@ -5,7 +5,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const VidhiAgent = {
     role: "vidhi",
-    model: "gemini-2.5-pro", // High reasoning capability
+    model: "gemini-2.5-flash-lite", // High reasoning capability
 
     systemInstruction: `
     You are VIDHI (The Governance Engine).

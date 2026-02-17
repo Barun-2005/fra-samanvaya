@@ -18,7 +18,7 @@ async function extractClaimData(fileBuffer, mimeType) {
         }
 
         // Get the generative model
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
         // Convert buffer to base64
         const base64Data = fileBuffer.toString('base64');

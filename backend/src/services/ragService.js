@@ -4,7 +4,7 @@ const KnowledgeBase = require('../models/KnowledgeBase');
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const embeddingModel = genAI.getGenerativeModel({ model: "text-embedding-004" });
-const chatModel = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+const chatModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
 
 /**
  * Generate embedding for a text string
