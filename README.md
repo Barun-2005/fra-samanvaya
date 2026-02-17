@@ -53,57 +53,57 @@ This isn't a CRUD app with a chatbot bolted on. Every role gets a unique dashboa
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FRONTEND (Next.js 16 + React 19)             │
-│  ┌──────────┐ ┌────────────────┐ ┌──────────┐ ┌─────────────┐  │
-│  │ Login    │ │ 8 Role-Based   │ │ Claim    │ │ Smart OCR   │  │
-│  │ + 2FA    │ │ Dashboards     │ │ Detail   │ │ Upload +    │  │
-│  │          │ │ (~146 KB)      │ │ (978 ln) │ │ Voice Input │  │
-│  └──────────┘ └────────────────┘ └──────────┘ └─────────────┘  │
-│  ┌──────────────────────┐  ┌────────────────────────────────┐  │
-│  │ Legal Workbench      │  │ Atlas Map (Leaflet + GeoJSON)  │  │
-│  │ Canvas Editor        │  │ Polygon Drawing + Area Calc    │  │
-│  └──────────────────────┘  └────────────────────────────────┘  │
+│  ┌──────────┐ ┌────────────────┐ ┌──────────┐ ┌─────────────┐   │
+│  │ Login    │ │ 8 Role-Based   │ │ Claim    │ │ Smart OCR   │   │
+│  │ + 2FA    │ │ Dashboards     │ │ Detail   │ │ Upload +    │   │
+│  │          │ │ (~146 KB)      │ │ (978 ln) │ │ Voice Input │   │
+│  └──────────┘ └────────────────┘ └──────────┘ └─────────────┘   │
+│  ┌──────────────────────┐  ┌────────────────────────────────┐   │
+│  │ Legal Workbench      │  │ Atlas Map (Leaflet + GeoJSON)  │   │
+│  │ Canvas Editor        │  │ Polygon Drawing + Area Calc    │   │
+│  └──────────────────────┘  └────────────────────────────────┘   │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                     TRINITY AI ENGINE                           │
-│  ┌─────────────────┐ ┌──────────────────┐ ┌─────────────────┐  │
-│  │ 🤝 MITRA        │ │ 🛡️ SATARK        │ │ ⚖️ VIDHI        │  │
-│  │ Service Agent   │ │ Vigilance Agent  │ │ Governance Agent│  │
-│  │ ─────────────── │ │ ──────────────── │ │ ─────────────── │  │
-│  │ • Citizen chat  │ │ • Vision AI      │ │ • Legal RAG     │  │
-│  │ • Form autofill│ │ • Satellite vs   │ │ • Precedent     │  │
-│  │ • Scheme search│ │   site photo     │ │   search        │  │
-│  │ • Status lookup│ │ • Turf.js geo    │ │ • Order draft   │  │
-│  │                │ │ • GPS verify     │ │ • Self-correct  │  │
-│  └─────────────────┘ └──────────────────┘ └─────────────────┘  │
+│  ┌─────────────────┐ ┌──────────────────┐ ┌─────────────────┐   │
+│  │🤝 MITRA         ││ 🛡️ SATARK        │ │ ⚖️ VIDHI        │  │
+│  │ Service Agent   │ │ Vigilance Agent  │ │ Governance Agent│   │
+│  │ ─────────────── │ │ ──────────────── │ │ ─────────────── │   │
+│  │ • Citizen chat  │ │ • Vision AI      │ │ • Legal RAG     │   │
+│  │ • Form autofill │ │ • Satellite vs   │ │ • Precedent     │   │ 
+│  │ • Scheme search │ │   site photo     │ │   search        │   │
+│  │ • Status lookup │ │ • Turf.js geo    │ │ • Order draft   │   │
+│  │                 │ │ • GPS verify     │ │ • Self-correct  │   │
+│  └─────────────────┘ └──────────────────┘ └─────────────────┘   │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                     13 BACKEND SERVICES                         │
-│  ┌──────────────────┐ ┌──────────────────┐ ┌────────────────┐  │
-│  │ Document         │ │ RAG Service      │ │ Risk Engine    │  │
-│  │ Processor        │ │ Hybrid Search    │ │ Rules + AI     │  │
-│  │ Sharp→SHA→OCR    │ │ Vector + RRF     │ │ Scoring        │  │
-│  ├──────────────────┤ ├──────────────────┤ ├────────────────┤  │
-│  │ Conflict         │ │ Anomaly          │ │ PDF Generator  │  │
-│  │ Detector         │ │ Detector         │ │ Form C Title   │  │
-│  │ Geo Overlap      │ │ Fraud Patterns   │ │ Deeds          │  │
-│  ├──────────────────┤ ├──────────────────┤ ├────────────────┤  │
-│  │ Notification     │ │ Policy Matcher   │ │ Satark Tools   │  │
-│  │ Email + SMS      │ │ DA-JGUA Schemes  │ │ Turf.js Verify │  │
-│  └──────────────────┘ └──────────────────┘ └────────────────┘  │
+│  ┌──────────────────┐ ┌──────────────────┐ ┌────────────────┐   │
+│  │ Document         │ │ RAG Service      │ │ Risk Engine    │   │
+│  │ Processor        │ │ Hybrid Search    │ │ Rules + AI     │   │
+│  │ Sharp→SHA→OCR    │ │ Vector + RRF     │ │ Scoring        │   │
+│  ├──────────────────┤ ├──────────────────┤ ├────────────────┤   │
+│  │ Conflict         │ │ Anomaly          │ │ PDF Generator  │   │
+│  │ Detector         │ │ Detector         │ │ Form C Title   │   │
+│  │ Geo Overlap      │ │ Fraud Patterns   │ │ Deeds          │   │
+│  ├──────────────────┤ ├──────────────────┤ ├────────────────┤   │
+│  │ Notification     │ │ Policy Matcher   │ │ Satark Tools   │   │
+│  │ Email + SMS      │ │ DA-JGUA Schemes  │ │ Turf.js Verify │   │
+│  └──────────────────┘ └──────────────────┘ └────────────────┘   │
 └──────────────────────────────┬──────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                        DATA LAYER                               │
-│  ┌──────────────────────────┐  ┌────────────────────────────┐  │
-│  │ MongoDB Atlas            │  │ Knowledge Base             │  │
-│  │ Vector Search (768-dim)  │  │ FRA 2006 Laws + Schemes    │  │
-│  │ 8 Models + Embeddings    │  │ Ingested for RAG           │  │
-│  └──────────────────────────┘  └────────────────────────────┘  │
+│  ┌──────────────────────────┐  ┌────────────────────────────┐   │
+│  │ MongoDB Atlas            │  │ Knowledge Base             │   │
+│  │ Vector Search (768-dim)  │  │ FRA 2006 Laws + Schemes    │   │
+│  │ 8 Models + Embeddings    │  │ Ingested for RAG           │   │
+│  └──────────────────────────┘  └────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -245,7 +245,7 @@ fra-samanvay/
 ├── backend/
 │   └── src/
 │       ├── ai/
-│       │   ├── AgentFactory.js          # 503 lines — instantiates role-specific agents
+│       │   ├── AgentFactory.js          # instantiates role-specific agents
 │       │   ├── agents/
 │       │   │   ├── SatarkAgent.js       # Vigilance agent config
 │       │   │   └── VidhiAgent.js        # Legal agent config
@@ -257,20 +257,20 @@ fra-samanvay/
 │       │       ├── schemeTool.js        # Scheme search tool
 │       │       └── verificationTools.js # Verification utilities
 │       ├── controllers/                 # 11 API controllers
-│       │   ├── claimController.js       # 842 lines — full statutory workflow
+│       │   ├── claimController.js       # full statutory workflow
 │       │   ├── authController.js        # JWT + 2FA authentication
 │       │   ├── documentController.js    # OCR pipeline trigger
 │       │   ├── vidhiController.js       # Legal AI endpoints
 │       │   └── ...
 │       ├── models/                      # 8 MongoDB schemas
-│       │   ├── Claim.js                 # 190 lines — legal state machine with VALID_TRANSITIONS
+│       │   ├── Claim.js                 # legal state machine with VALID_TRANSITIONS
 │       │   ├── User.js                  # Role-based user model
 │       │   ├── KnowledgeBase.js         # RAG document store
 │       │   └── ...
 │       ├── services/                    # 13 specialized services
 │       │   ├── documentProcessor.js     # 3-tier: Sharp → SHA-256 → Gemini OCR
-│       │   ├── ragService.js            # 387 lines — hybrid search with RRF
-│       │   ├── pdfGenerator.js          # 501 lines — Form C Title Deed generation
+│       │   ├── ragService.js            # hybrid search with RRF
+│       │   ├── pdfGenerator.js          # Form C Title Deed generation
 │       │   ├── riskEngine.js            # Rule-based + AI risk scoring
 │       │   ├── conflictDetector.js      # Geospatial overlap detection
 │       │   ├── anomalyDetector.js       # Fraud pattern detection
@@ -283,7 +283,7 @@ fra-samanvay/
 │   ├── pages/
 │   │   ├── dashboard/                   # 8 role-specific dashboards (~146 KB total)
 │   │   ├── claims/
-│   │   │   └── [id].js                  # 978 lines — claim detail + Legal Workbench
+│   │   │   └── [id].js                  # claim detail + Legal Workbench
 │   │   ├── create-claim.js              # Multi-step submission wizard
 │   │   ├── login.js                     # Authentication page
 │   │   └── 2fa.js                       # Two-factor authentication
@@ -397,7 +397,7 @@ When a claim reaches `Title_Issued` status, the platform auto-recommends eligibl
 
 ## Author
 
-**Barun Kumar Pattanaik** — Lead Backend Developer & AI Architect
+**Barun Kumar Pattanaik** 
 
 - Built the complete backend (13 services, 8 models, 11 controllers, 11 routes)
 - Designed and implemented the Trinity AI Engine (Mitra, Satark, Vidhi)
